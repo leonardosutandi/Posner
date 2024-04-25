@@ -34,8 +34,8 @@ Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
 x = xCenter;
 y = yCenter;
 
-polyWidth = 100;
-polyHeight = 100;
+polyWidth = 125;
+polyHeight = 125;
 penWidth = 50;
 
 % Abbr. for the cues below:
@@ -47,20 +47,19 @@ penWidth = 50;
 
 %% ------------------ Fixation Diamond -------------------
 
-xCoordFD = [x, x - (polyWidth/2), x, x + (polyWidth/2)]';
-yCoordFD = [y + (polyHeight /2), y, y - (polyHeight /2), y]';
+xCoordFD = [xCenter, xCenter - (polyWidth/2), xCenter, xCenter + (polyWidth/2)]';
+yCoordFD = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), y]';
 pointListFD = [xCoordFD yCoordFD];
 
 colorFD = blue;
-penWidth = 50;
 
 Screen('FramePoly', window, colorFD, pointListFD, penWidth);
 % Screen('Flip', window);
 
 %% ---------------------- Left Cue -----------------------
 
-xCoordL = [x, x - (polyWidth/2), x, x - (polyWidth/2)]';
-yCoordL = [y + (polyHeight /2), y, y - (polyHeight /2), y]';
+xCoordL = [xCenter, xCenter - (polyWidth/2), xCenter, xCenter - (polyWidth/2)]';
+yCoordL = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
 pointListL = [xCoordL yCoordL];
 
 colorL = green;
@@ -73,8 +72,8 @@ Screen('FramePoly', window, colorL, pointListL, penWidth);
 
 %% ---------------------- Right Cue -----------------------
 
-xCoordR = [x, x + (polyWidth/2), x, x + (polyWidth/2)]';
-yCoordR = [y + (polyHeight /2), y, y - (polyHeight /2), y]';
+xCoordR = [xCenter, xCenter + (polyWidth/2), xCenter, xCenter + (polyWidth/2)]';
+yCoordR = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
 pointListR = [xCoordR yCoordR];
 
 colorR = green;
@@ -87,8 +86,8 @@ Screen('Flip', window);
 
 %% --------------------- Neutral Cue ----------------------
 
-xCoordNC = [x, x + (polyWidth/2), x, x + (polyWidth/2)]';
-yCoordNC = [y + (polyHeight /2), y, y - (polyHeight /2), y]';
+xCoordNC = [xCenter, xCenter + (polyWidth/2), xCenter, xCenter + (polyWidth/2)]';
+yCoordNC = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
 pointListNC = [xCoordNC yCoordNC];
 
 colorNC = green;
@@ -103,8 +102,8 @@ sca;
 
 %% ----------------------- NA Cue ------------------------
 
-% xCoordNA = [x, x + (polyWidth/2), x, x - (polyWidth/2)]';
-% yCoordNA = [y + (polyHeight /2), y, y - (polyHeight /2), y]';
+% xCoordNA = [xCenter, xCenter + (polyWidth/2), xCenter, xCenter - (polyWidth/2)]';
+% yCoordNA = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
 % pointListNA = [xCoordNA yCoordNA];
 % 
 % colorNA = red;
@@ -114,13 +113,78 @@ sca;
 
 % Screen('Flip', window);
 
-%% ---------------- Gratings Parameters ------------------
+%% ------------- Bilateral Rings Parameters ---------------
 
+% Set the parameters for the Landolt C + Gratings
+innerRadius = 250; % Radius of the ring
+ringThickness = 30; % Thickness of the ring
+totalRadius = innerRadius + ringThickness;
 
+% Define Left & Right Positioning of Stimuli
+left = [xCenter/2 - totalRadius, yCenter/0.75 - totalRadius, ...
+    xCenter/2 + totalRadius, yCenter/0.75 + totalRadius]
+right = [xCenter*1.5 - totalRadius, yCenter/0.75 - totalRadius, ...
+    xCenter*1.5 + totalRadius, yCenter/0.75 + totalRadius]
 
-
+% Display Rings (W/O Gap)
+% Left
+Screen('FrameOval', window, black, left, ringThickness, [], []);
+% Right
+Screen('FrameOval', window, black, right, ringThickness, [], []);
 
 %% --------------- Target Gap Parameters -----------------
+
+% % Gap Initial Loc (angle) <<<<<<<<<<<<<<<<<<<<<<<<< This is my own calc
+% % Left
+% loc1 = 200;
+% loc2 = 240;
+% loc3 = 280;
+% loc4 = 320;
+% % Right
+% loc5 = 20;
+% loc6 = 40;
+% loc7 = 80;
+% loc8 = 120;
+% 
+% % Gap Initial Loc (angle) <<<<<<<<<<<<<<<<<<<<<<<<< From MSc
+% % Left
+% loc1 = 225;
+% loc2 = 255;
+% loc3 = 285;
+% loc4 = 315;
+% % Right
+% loc5 = 45;
+% loc6 = 75;
+% loc7 = 105;
+% loc8 = 135;
+
+% Gap Distance from Initial Loc (Clockwise)
+gapDist = 30;
+
+% % Display the Gap to the Rings
+% % Left
+% % loc1
+% Screen('FillArc', window, grey, left, loc1, gapDist);
+% % loc2
+% Screen('FillArc', window, grey, left, loc2, gapDist);
+% % loc3
+% Screen('FillArc', window, grey, left, loc3, gapDist);
+% % loc4
+% Screen('FillArc', window, grey, left, loc4, gapDist);
+% 
+% % Right
+% % loc5
+% Screen('FillArc', window, grey, right, loc5, gapDist);
+% % loc6
+% Screen('FillArc', window, grey, right, loc6, gapDist);
+% % loc7
+% Screen('FillArc', window, grey, right, loc7, gapDist);
+% % loc8
+% Screen('FillArc', window, grey, right, loc8, gapDist);
+
+
+%% ---------------- Gratings Parameters ------------------
+
 
 
 
@@ -134,18 +198,6 @@ sca;
 
 %% ----------------------- Timing ------------------------
 
-% Concentric rings time (only stimulus trial)
-
-
-% Fixation time
-
-
-% Spatial cue time (colour change)
-
-
-% Target gap time
-
-
 % 1. Fix (T) > 2. Cue (T) > 3. Gap (T) > 4. Gap Identification (R) > 5. Screen - Gap Location? (R)
     % Reaction Time (RT)
         % Valid vs invalid
@@ -154,6 +206,42 @@ sca;
         % Gap (L/R) accuracy
         % Gap (location) accuracy
 
+% These are pretty much random - you will need to look at the literature to
+% see what is used. Also, note the use of "round" which would be
+% dangerous to blindly use in an experiment.
+
+% Fixation (Baseline) point time in seconds and frames (2-3 secs)
+fixTimeSecs = 2;
+fixTimeFrames = round(fixTimeSecs / ifi);
+
+% Spatial Cue (Attention Deployment) point time in seconds and frames (1-1.5 secs)
+cueTimeSecs = 1;
+cueTimeFrames = round(cueTimeSecs / ifi);
+
+% Target (Onset) point time in seconds and frames (0.1 secs)
+tonsetTimeSecs = 0.1;
+targetTimeFrames = round(tonsetTimeSecs / ifi);
+
+% Target (Detection) point time in seconds and frames (1-1.5 secs - lapse time if no response)
+tDetectionTimeSecs = 0.15;
+targetTimeFrames = round(tDetectionTimeSecs / ifi);
+
+% Target (Precision Gap) point time in seconds and frames (0.1 secs);
+% HARUSNYA GA ADA
+tPrecTimeSecs = 0.15;
+targetTimeFrames = round(tPrecTimeSecs / ifi);
+
+% Intertrial interval time
+isiTimeSecs = 0.2;
+isiTimeFrames = round(isiTimeSecs / ifi);
+
+% Time between the cue and the target
+cueTargetTimeSecs = 0.3;
+cueTargetTimeFrames = round(isiTimeSecs / ifi);
+
+% Frames to wait before redrawing
+waitframes = 1;
+
 %% ------------------ Keyboard Response ------------------
 
 % Define the keyboard press
@@ -161,12 +249,12 @@ sca;
 % Exit/reset key
 esc = KbName('ESCAPE');
 
-% Response L/R Circle
+% Detection Response L/R Circle
     % Which cirlce have the gap?
     locL = KbName('4$');
     locR = KbName('5%');
 
-% Response Gap Location
+% Precision Response Gap Location
     % Left circle gap locations
     loc1 = KbName('1!');
     loc2 = KbName('2@');
