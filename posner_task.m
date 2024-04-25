@@ -82,7 +82,7 @@ Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
 Screen('FramePoly', window, colorFD, pointListFD, penWidth);
 Screen('FramePoly', window, colorR, pointListR, penWidth);
 
-Screen('Flip', window);
+% Screen('Flip', window);
 
 %% --------------------- Neutral Cue ----------------------
 
@@ -96,9 +96,6 @@ Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
 Screen('FramePoly', window, colorNC, pointListNC, penWidth);
 
 % Screen('Flip', window);
-
-KbWait;
-sca; 
 
 %% ----------------------- NA Cue ------------------------
 
@@ -132,6 +129,8 @@ Screen('FrameOval', window, black, left, ringThickness, [], []);
 % Right
 Screen('FrameOval', window, black, right, ringThickness, [], []);
 
+% Screen('Flip', window);
+
 %% --------------- Target Gap Parameters -----------------
 
 % % Gap Initial Loc (angle) <<<<<<<<<<<<<<<<<<<<<<<<< This is my own calc
@@ -161,27 +160,28 @@ Screen('FrameOval', window, black, right, ringThickness, [], []);
 % Gap Distance from Initial Loc (Clockwise)
 gapDist = 30;
 
-% % Display the Gap to the Rings
-% % Left
-% % loc1
-% Screen('FillArc', window, grey, left, loc1, gapDist);
-% % loc2
-% Screen('FillArc', window, grey, left, loc2, gapDist);
-% % loc3
-% Screen('FillArc', window, grey, left, loc3, gapDist);
-% % loc4
-% Screen('FillArc', window, grey, left, loc4, gapDist);
-% 
-% % Right
-% % loc5
-% Screen('FillArc', window, grey, right, loc5, gapDist);
-% % loc6
-% Screen('FillArc', window, grey, right, loc6, gapDist);
-% % loc7
-% Screen('FillArc', window, grey, right, loc7, gapDist);
-% % loc8
-% Screen('FillArc', window, grey, right, loc8, gapDist);
+% Display the Gap to the Rings
+% Left
+% loc1
+Screen('FillArc', window, grey, left, loc1, gapDist);
+% loc2
+Screen('FillArc', window, grey, left, loc2, gapDist);
+% loc3
+Screen('FillArc', window, grey, left, loc3, gapDist);
+% loc4
+Screen('FillArc', window, grey, left, loc4, gapDist);
 
+% Right
+% loc5
+Screen('FillArc', window, grey, right, loc5, gapDist);
+% loc6
+Screen('FillArc', window, grey, right, loc6, gapDist);
+% loc7
+Screen('FillArc', window, grey, right, loc7, gapDist);
+% loc8
+Screen('FillArc', window, grey, right, loc8, gapDist);
+
+% Screen('Flip', window);
 
 %% ---------------- Gratings Parameters ------------------
 
@@ -276,7 +276,7 @@ esc = KbName('ESCAPE');
 
 
 
-%% ------------------------- Loop ------------------------
+%% ------------------------ Loop -------------------------
 
 
 
@@ -285,6 +285,10 @@ esc = KbName('ESCAPE');
 
 
 
+%% ----------------------- Close -------------------------
 
+
+KbWait;
+sca; 
 
 
