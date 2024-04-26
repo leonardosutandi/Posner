@@ -190,12 +190,6 @@ Screen('FillArc', window, grey, right, loc8, gapDist);
 
 
 
-%% ------------------- Validity --------------------
-
-
-
-% include both valid invalid here ?
-
 %% ----------------------- Timing ------------------------
 
 % 1. Fix (T) > 2. Cue (T) > 3. Gap (T) > 4. Gap Identification (R) > 5. Screen - Gap Location? (R)
@@ -271,16 +265,15 @@ esc = KbName('ESCAPE');
 
 %% ---------------------- Procedure ----------------------
 
-% Gabor target and square cue will appear to the left and right of the
-% fixation. Left will be signalled by '0' and right will be signalled by '1'. 
-% They can be "valid" or "invalid". We create a matrix with the four possible
-% cue and target positions. Upper line will be the cue position, lower line
-% the target position.
-% baseMat = [0 0 1 1; 0 1 0 1];
+% Validity Setup
+
+% Gabor target and square cue will appear to the left (0) and right (1) of the
+% fixation. They can be "valid - 0" or "invalid - 1". Create 2 matrices (valid and invalid) 
+% each with 8 possible cue and target/gap positions.
 
 % baseMat = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
 %            0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0; ... % Target Loc Validity (always congruent w/ gap loc)
-%            0 1 2 3 4 5 6 7 4 5 6 7 0 1 2 3];    % Gap Loc
+%            0 1 2 3 4 5 6 7 4 5 6 7 0 1 2 3];    % Gap Loc (0: loc1, 1: loc2, etc.)
 
 % Valid
 baseMatVal = [0 0 0 0 1 1 1 1; ... % Spatial Cue
