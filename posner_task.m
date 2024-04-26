@@ -310,6 +310,96 @@ dataMat = nan(numTrials, 2); % sama ini juga simpen
 
 
 %% ------------------------ Loop -------------------------
+% Draw the fixation cross in black, set it to the center of our screen and
+% % set good quality antialiasing
+% Screen('DrawLines', window, allCoords,...
+%     lineWidthPix, black, [xCenter yCenter], 2);
+
+% Animation loop: we loop for the total number of trials
+for trial = 1:numTrials
+
+    % % Set Grating parameters (?) randomise
+    % phase = rand .* 360;
+    % propertiesMat = [phase, freq, sigma, contrast, aspectRatio, 0, 0, 0]';
+
+    % Cue and target position
+    cuePos = combinedTrialsShuff(1, trial);
+    targetPos = combinedTrialsShuff(2, trial);
+
+    % Logic to assign the correct position to the cue and target
+    if cuePos == 0
+        cueRect = left;
+    elseif cuePos == 1
+        cueRect = right;
+    end
+
+    if targetPos == 0 || 1 || 2 || 3
+        targetRect = left;
+    elseif targetPos == 4 || 5 || 6 || 7
+        targetRect = rightRect;
+    end
+
+    % Set the blend funciton for a nice antialiasing
+    Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    % If this is the first trial we present a start screen and wait for a key-press
+    if trial == 1
+
+        % Draw the instructions
+        openingLine1 = 'The purpose of this study is to assess how the neural oscillations,';
+        openingLine2 = '\n or how the brain communicates, differ between migraineurs and non-migraineurs.';
+        openingLine3 = '\n You will be presented with centrally fixated visual cues, indicating';
+        openingLine4 = '\n which visual field (left or right) to covertly atttend to';
+        openingLine5 = '\n (without moving your eyes) to identify a visual target.';
+        openingLine6 = '\n\n Press any key to continue.';
+        Screen('TextSize', window, 60);
+        DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
+
+        % Flip to the screen
+        Screen('Flip', window);
+
+        % Wait for a key press
+        KbStrokeWait(-1);
+
+        % Flip the screen grey
+        Screen('FillRect', window, grey);
+        vbl = Screen('Flip', window);
+        WaitSecs(0.5);
+
+    end
+
+    if trial == 1
+
+        % Draw the instructions        
+        openingLine1 = 'Any of the following central visual cues will manifest along the trial:';
+        img = imread('C:\Users\Leonardo\Documents\NTU\Task Pics\Diamonds.png');
+        imgTexture = Screen('MakeTexture', window, img);
+        Screen('DrawTexture', window, imgTexture);
+        openingLine2 = '\n\n if left side of diamond turns green (1), you must deploy to your attention to the left side of the screen';
+        openingLine3 = '\n if right side of diamond turns green (2), you must deploy to your attention to the right of side the screen';
+        openingLine4 = '\n if both sides of diamond turns green (3), you must deploy to your attention to both sides the screen';
+        openingLine5 = '\n\n REMEMBER!';
+        openingLine6 = '\n Always fixate your eyes on the central cross while your attention is deployed';
+        Screen('TextSize', window, 60);
+        DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
+
+
+        % Flip to the screen
+        Screen('Flip', window);
+
+        % Wait for a key press
+        KbStrokeWait(-1);
+
+        % Flip the screen grey
+        Screen('FillRect', window, grey);
+        vbl = Screen('Flip', window);
+        WaitSecs(0.5);
+
+    end
+
+
+
+end
 
 
 
