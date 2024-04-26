@@ -190,7 +190,7 @@ Screen('FillArc', window, grey, right, loc8, gapDist);
 
 
 
-%% ------------------- Stim Positions --------------------
+%% ------------------- Validity --------------------
 
 
 
@@ -271,9 +271,48 @@ esc = KbName('ESCAPE');
 
 %% ---------------------- Procedure ----------------------
 
+% Gabor target and square cue will appear to the left and right of the
+% fixation. Left will be signalled by '0' and right will be signalled by '1'. 
+% They can be "valid" or "invalid". We create a matrix with the four possible
+% cue and target positions. Upper line will be the cue position, lower line
+% the target position.
+% baseMat = [0 0 1 1; 0 1 0 1];
 
+% baseMat = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
+%            0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0; ... % Target Loc Validity (always congruent w/ gap loc)
+%            0 1 2 3 4 5 6 7 4 5 6 7 0 1 2 3];    % Gap Loc
 
+% Valid
+baseMatVal = [0 0 0 0 1 1 1 1; ... % Spatial Cue
+              0 0 0 0 1 1 1 1; ... % Target Loc Validity (always congruent w/ gap loc)
+              0 1 2 3 4 5 6 7];    % Gap Loc
 
+% mau brp trial anggep 96 trial valid = 8 kombinasi valid * 12
+numRepsVal = 12; 
+% tabel kemungkinan kombinasi buat 80% trial
+cueTargetMatVal = repmat(baseMatVal, 1, numRepsVal);
+
+% Invalid
+baseMatInv = [0 0 0 0 1 1 1 1; ... % Spatial Cue
+              1 1 1 1 0 0 0 0; ... % Target Loc Validity (always congruent w/ gap loc)
+              4 5 6 7 0 1 2 3];    % Gap Loc
+% mau brp trial anggep 24 trial invalid = 8 kombinasi invalid * 3
+numRepsInv = 3;
+% tabel kemungkinan kombinasi buat 20% trial
+cueTargetMatInv = repmat(baseMatInv, 1, numRepsInv);
+
+% Combine Valid + Invalid trials > 120 trials (96 valid + 24 invalid)
+combinedValInvTrials = [cueTargetMatVal cueTargetMatInv];
+
+% Randomise the trials
+combinedValInvTrialsShuff = Shuffle(combinedValInvTrials, 2);
+
+% How many trials are we doing in total
+numTrials = size(combinedValInvTrialsShuff, 2); % data aja ini mah
+
+% Make our response matrix which will save the RT and correctness of the
+% location choice. We preallocate the matrix with nans.
+dataMat = nan(numTrials, 2); % sama ini juga simpen
 
 
 %% ------------------------ Loop -------------------------
@@ -290,5 +329,23 @@ esc = KbName('ESCAPE');
 
 KbWait;
 sca; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
