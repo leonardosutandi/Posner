@@ -267,9 +267,10 @@ esc = KbName('ESCAPE');
 
 % Validity Setup
 
-% Gabor target and square cue will appear to the left (0) and right (1) of the
-% fixation. They can be "valid - 0" or "invalid - 1". Create 2 matrices (valid and invalid) 
-% each with 8 possible cue and target/gap positions.
+% Spatial cue will either be left (0) or right (1) and can be "valid - 0/0 or 1/1" 
+% or "invalid - 0/1 or 1/0". Create 2 matrices (valid and invalid) each with 8 
+% possible combination of cue and target/gap positions. Then combine to
+% achieve 80% validity.
 
 % baseMat = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
 %            0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0; ... % Target Loc Validity (always congruent w/ gap loc)
@@ -280,28 +281,26 @@ baseMatVal = [0 0 0 0 1 1 1 1; ... % Spatial Cue
               0 0 0 0 1 1 1 1; ... % Target Loc Validity (always congruent w/ gap loc)
               0 1 2 3 4 5 6 7];    % Gap Loc
 
-% mau brp trial anggep 96 trial valid = 8 kombinasi valid * 12
+% For 96 valid trials (80%) = 8 valid combination * 12
 numRepsVal = 12; 
-% tabel kemungkinan kombinasi buat 80% trial
 cueTargetMatVal = repmat(baseMatVal, 1, numRepsVal);
 
 % Invalid
 baseMatInv = [0 0 0 0 1 1 1 1; ... % Spatial Cue
               1 1 1 1 0 0 0 0; ... % Target Loc Validity (always congruent w/ gap loc)
               4 5 6 7 0 1 2 3];    % Gap Loc
-% mau brp trial anggep 24 trial invalid = 8 kombinasi invalid * 3
+% For 24 invalid trials (20%) = 8 invalid combination * 3
 numRepsInv = 3;
-% tabel kemungkinan kombinasi buat 20% trial
 cueTargetMatInv = repmat(baseMatInv, 1, numRepsInv);
 
-% Combine Valid + Invalid trials > 120 trials (96 valid + 24 invalid)
-combinedValInvTrials = [cueTargetMatVal cueTargetMatInv];
+% Combine Valid (96) + Invalid (24) trials = 120 trials total
+combinedTrials = [cueTargetMatVal cueTargetMatInv];
 
 % Randomise the trials
-combinedValInvTrialsShuff = Shuffle(combinedValInvTrials, 2);
+combinedTrialsShuff = Shuffle(combinedTrials, 2);
 
 % How many trials are we doing in total
-numTrials = size(combinedValInvTrialsShuff, 2); % data aja ini mah
+numTrials = size(combinedTrialsShuff, 2); % data aja ini mah
 
 % Make our response matrix which will save the RT and correctness of the
 % location choice. We preallocate the matrix with nans.
