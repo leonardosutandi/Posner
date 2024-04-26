@@ -278,7 +278,6 @@ esc = KbName('ESCAPE');
 
 % Valid
 baseMatVal = [0 0 0 0 1 1 1 1; ... % Spatial Cue
-              0 0 0 0 1 1 1 1; ... % Target Loc Validity (always congruent w/ gap loc)
               0 1 2 3 4 5 6 7];    % Gap Loc
 
 % For 96 valid trials (80%) = 8 valid combination * 12
@@ -287,7 +286,6 @@ cueTargetMatVal = repmat(baseMatVal, 1, numRepsVal);
 
 % Invalid
 baseMatInv = [0 0 0 0 1 1 1 1; ... % Spatial Cue
-              1 1 1 1 0 0 0 0; ... % Target Loc Validity (always congruent w/ gap loc)
               4 5 6 7 0 1 2 3];    % Gap Loc
 % For 24 invalid trials (20%) = 8 invalid combination * 3
 numRepsInv = 3;
@@ -297,10 +295,14 @@ cueTargetMatInv = repmat(baseMatInv, 1, numRepsInv);
 combinedTrials = [cueTargetMatVal cueTargetMatInv];
 
 % Randomise the trials
-combinedTrialsShuff = Shuffle(combinedTrials, 2);
+% combinedTrialsShuff = Shuffle(combinedTrials, 2); < shuffle not working (?)
+cols = size(combinedTrials, 2);
+randCol = randperm(cols);
+combinedTrialsShuff = combinedTrials(:, randCol);
 
-% How many trials are we doing in total
-numTrials = size(combinedTrialsShuff, 2); % data aja ini mah
+
+% Total number of trials
+numTrials = size(combinedTrialsShuff, 2); % for for loops
 
 % Make our response matrix which will save the RT and correctness of the
 % location choice. We preallocate the matrix with nans.
