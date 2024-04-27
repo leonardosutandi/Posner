@@ -272,27 +272,33 @@ esc = KbName('ESCAPE');
 % possible combination of cue and target/gap positions. Then combine to
 % achieve 80% validity.
 
-% baseMat = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
-%            0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0; ... % Target Loc Validity (always congruent w/ gap loc)
-%            0 1 2 3 4 5 6 7 4 5 6 7 0 1 2 3];    % Gap Loc (0: loc1, 1: loc2, etc.)
-
 % Valid
-baseMatVal = [0 0 0 0 1 1 1 1; ... % Spatial Cue
-              0 1 2 3 4 5 6 7];    % Gap Loc
+baseMatVal = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
+              0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7; ... % Gap Loc
+              0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1];    % Stim Condition
 
-% For 96 valid trials (80%) = 8 valid combination * 12
-numRepsVal = 12; 
+% For 64 valid trials (80% of Spatial Cue Condition) = 16 valid combination * 6
+numRepsVal = 4; 
 cueTargetMatVal = repmat(baseMatVal, 1, numRepsVal);
 
 % Invalid
-baseMatInv = [0 0 0 0 1 1 1 1; ... % Spatial Cue
-              4 5 6 7 0 1 2 3];    % Gap Loc
-% For 24 invalid trials (20%) = 8 invalid combination * 3
-numRepsInv = 3;
+baseMatInv = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
+              4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3; ... % Gap Loc
+              0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1];    % Stim Condition
+% For 16 invalid trials (20% of Spatial Cue Condition) = 16 invalid combination * 1
+numRepsInv = 1;
 cueTargetMatInv = repmat(baseMatInv, 1, numRepsInv);
 
-% Combine Valid (96) + Invalid (24) trials = 120 trials total
-combinedTrials = [cueTargetMatVal cueTargetMatInv];
+% Neutral
+baseMatNeutral = [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2; ... % Neutral Cue
+                  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7; ... % Gap Loc
+                  0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1];    % Stim Condition
+% For 16 Neutral trials (16.6% of Total Trials) = 16 invalid combination * 1
+numRepsNeutral = 1;
+cueTargetMatNeutral = repmat(baseMatNeutral, 1, numRepsNeutral);
+
+% Combine Valid (64) + Invalid (16) + Neutral (16) = 96 trials total
+combinedTrials = [cueTargetMatVal cueTargetMatInv cueTargetMatNeutral];
 
 % Randomise the trials
 % combinedTrialsShuff = Shuffle(combinedTrials, 2); < shuffle not working (?)
