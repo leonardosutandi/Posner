@@ -277,7 +277,7 @@ baseMatVal = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
               0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7; ... % Gap Loc
               0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1];    % Stim Condition
 
-% For 64 valid trials (80% of Spatial Cue Condition) = 16 valid combination * 6
+% For 64 valid trials (80% of Spatial Cue Condition) = 16 valid combination * 4
 numRepsVal = 4; 
 cueTargetMatVal = repmat(baseMatVal, 1, numRepsVal);
 
