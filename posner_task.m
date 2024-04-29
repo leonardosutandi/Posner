@@ -352,7 +352,7 @@ for trial = 1:numTrials
     if trial == 1
 
         % Draw the instructions
-        openingLine1 = 'The purpose of this study is to assess how the neural oscillations,';
+        openingLine1 = 'Welcome! the purpose of this study is to assess how the neural oscillations,';
         openingLine2 = '\n or how the brain communicates, differ between migraineurs and non-migraineurs.';
         openingLine3 = '\n You will be presented with centrally fixated visual cues, indicating';
         openingLine4 = '\n which visual field (left or right) to covertly atttend to';
