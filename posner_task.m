@@ -25,10 +25,8 @@ fcWidth = 4;
 
 % Draw the fixation cross in black, set it to the center of our screen and
 % set good quality antialiasing
-Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
+% Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
 
-% Flip to the screen
-%Screen('Flip', window);
 
 %% --------------- Spatial Cue Parameters ----------------
 x = xCenter;
@@ -51,10 +49,9 @@ xCoordFD = [xCenter, xCenter - (polyWidth/2), xCenter, xCenter + (polyWidth/2)]'
 yCoordFD = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), y]';
 pointListFD = [xCoordFD yCoordFD];
 
-colorFD = blue;
+colourFD = blue;
 
-Screen('FramePoly', window, colorFD, pointListFD, penWidth);
-% Screen('Flip', window);
+% Screen('FramePoly', window, colourFD, pointListFD, penWidth);
 
 %% ---------------------- Left Cue -----------------------
 
@@ -62,13 +59,13 @@ xCoordL = [xCenter, xCenter - (polyWidth/2), xCenter, xCenter - (polyWidth/2)]';
 yCoordL = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
 pointListL = [xCoordL yCoordL];
 
-colorL = green;
+colourL = green;
 
-Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
-Screen('FramePoly', window, colorFD, pointListFD, penWidth);
-Screen('FramePoly', window, colorL, pointListL, penWidth);
+% % Must have FC + SC
+% Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
+% Screen('FramePoly', window, colourFD, pointListFD, penWidth);
+% Screen('FramePoly', window, colourL, pointListL, penWidth);
 
-% Screen('Flip', window);
 
 %% ---------------------- Right Cue -----------------------
 
@@ -76,26 +73,25 @@ xCoordR = [xCenter, xCenter + (polyWidth/2), xCenter, xCenter + (polyWidth/2)]';
 yCoordR = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
 pointListR = [xCoordR yCoordR];
 
-colorR = green;
+colourR = green;
 
-Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
-Screen('FramePoly', window, colorFD, pointListFD, penWidth);
-Screen('FramePoly', window, colorR, pointListR, penWidth);
+% % Must have FC + SC
+% Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
+% Screen('FramePoly', window, colourFD, pointListFD, penWidth);
+% Screen('FramePoly', window, colourR, pointListR, penWidth);
 
-% Screen('Flip', window);
 
 %% --------------------- Neutral Cue ----------------------
 
-xCoordNC = [xCenter, xCenter + (polyWidth/2), xCenter, xCenter + (polyWidth/2)]';
-yCoordNC = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
+xCoordNC = [xCenter, xCenter - (polyWidth/2), xCenter, xCenter + (polyWidth/2)]';
+yCoordNC = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), y]';
 pointListNC = [xCoordNC yCoordNC];
 
-colorNC = green;
+colourNC = green;
 
-Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
-Screen('FramePoly', window, colorNC, pointListNC, penWidth);
-
-% Screen('Flip', window);
+% % Must have FC + SC
+% Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
+% Screen('FramePoly', window, colourNC, pointListNC, penWidth);
 
 %% ----------------------- NA Cue ------------------------
 
@@ -103,12 +99,12 @@ Screen('FramePoly', window, colorNC, pointListNC, penWidth);
 % yCoordNA = [yCenter + (polyHeight /2), yCenter, yCenter - (polyHeight /2), yCenter]';
 % pointListNA = [xCoordNA yCoordNA];
 % 
-% colorNA = red;
-% 
-% Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
-% Screen('FramePoly', window, colorNA, pointListNA, penWidth);
+% colourNA = red;
 
-% Screen('Flip', window);
+% % Must have FC + SC
+% Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
+% Screen('FramePoly', window, colourNA, pointListNA, penWidth);
+
 
 %% ------------- Bilateral Rings Parameters ---------------
 
@@ -124,12 +120,10 @@ right = [xCenter*1.5 - totalRadius, yCenter/0.75 - totalRadius, ...
     xCenter*1.5 + totalRadius, yCenter/0.75 + totalRadius]
 
 % Display Rings (W/O Gap)
-% Left
-Screen('FrameOval', window, black, left, ringThickness, [], []);
-% Right
-Screen('FrameOval', window, black, right, ringThickness, [], []);
-
-% Screen('Flip', window);
+% % Left
+% Screen('FrameOval', window, black, left, ringThickness, [], []);
+% % Right
+% Screen('FrameOval', window, black, right, ringThickness, [], []);
 
 %% --------------- Target Gap Parameters -----------------
 
@@ -144,44 +138,43 @@ Screen('FrameOval', window, black, right, ringThickness, [], []);
 % loc6 = 40;
 % loc7 = 80;
 % loc8 = 120;
-% 
+
 % % Gap Initial Loc (angle) <<<<<<<<<<<<<<<<<<<<<<<<< From MSc
-% % Left
-% loc1 = 225;
-% loc2 = 255;
-% loc3 = 285;
-% loc4 = 315;
-% % Right
-% loc5 = 45;
-% loc6 = 75;
-% loc7 = 105;
-% loc8 = 135;
+% Left
+loc1 = 225;
+loc2 = 255;
+loc3 = 285;
+loc4 = 315;
+% Right
+loc5 = 45;
+loc6 = 75;
+loc7 = 105;
+loc8 = 135;
 
 % Gap Distance from Initial Loc (Clockwise)
 gapDist = 30;
 
 % Display the Gap to the Rings
 % Left
-% loc1
-Screen('FillArc', window, grey, left, loc1, gapDist);
-% loc2
-Screen('FillArc', window, grey, left, loc2, gapDist);
-% loc3
-Screen('FillArc', window, grey, left, loc3, gapDist);
-% loc4
-Screen('FillArc', window, grey, left, loc4, gapDist);
+% % loc1
+% Screen('FillArc', window, grey, left, loc1, gapDist);
+% % loc2
+% Screen('FillArc', window, grey, left, loc2, gapDist);
+% % loc3
+% Screen('FillArc', window, grey, left, loc3, gapDist);
+% % loc4
+% Screen('FillArc', window, grey, left, loc4, gapDist);
 
 % Right
-% loc5
-Screen('FillArc', window, grey, right, loc5, gapDist);
-% loc6
-Screen('FillArc', window, grey, right, loc6, gapDist);
-% loc7
-Screen('FillArc', window, grey, right, loc7, gapDist);
-% loc8
-Screen('FillArc', window, grey, right, loc8, gapDist);
+% % loc5
+% Screen('FillArc', window, grey, right, loc5, gapDist);
+% % loc6
+% Screen('FillArc', window, grey, right, loc6, gapDist);
+% % loc7
+% Screen('FillArc', window, grey, right, loc7, gapDist);
+% % loc8
+% Screen('FillArc', window, grey, right, loc8, gapDist);
 
-% Screen('Flip', window);
 
 %% ---------------- Gratings Parameters ------------------
 
@@ -200,8 +193,7 @@ Screen('FillArc', window, grey, right, loc8, gapDist);
         % Gap (L/R) accuracy
         % Gap (location) accuracy
 
-% These are pretty much random - you will need to look at the literature to
-% see what is used. Also, note the use of "round" which would be
+% These are the duration of each time window after onset. Also, note the use of "round" which would be
 % dangerous to blindly use in an experiment.
 
 % Fixation (Baseline) point time in seconds and frames (2-3 secs)
@@ -213,25 +205,23 @@ cueTimeSecs = 1;
 cueTimeFrames = round(cueTimeSecs / ifi);
 
 % Target (Onset) point time in seconds and frames (0.1 secs)
-tonsetTimeSecs = 0.1;
-targetTimeFrames = round(tonsetTimeSecs / ifi);
+tOnsetTimeSecs = 0.1;
+targetTimeFrames = round(tOnsetTimeSecs / ifi);
 
 % Target (Detection) point time in seconds and frames (1-1.5 secs - lapse time if no response)
 tDetectionTimeSecs = 0.15;
 targetTimeFrames = round(tDetectionTimeSecs / ifi);
 
 % Target (Precision Gap) point time in seconds and frames (0.1 secs);
-% HARUSNYA GA ADA
-tPrecTimeSecs = 0.15;
-targetTimeFrames = round(tPrecTimeSecs / ifi);
-
-% Intertrial interval time
-isiTimeSecs = 0.2;
-isiTimeFrames = round(isiTimeSecs / ifi);
+% Wait for Gap location Response, then cont. to next trial
 
 % Time between the cue and the target
 cueTargetTimeSecs = 0.3;
 cueTargetTimeFrames = round(isiTimeSecs / ifi);
+
+% Intertrial interval time
+isiTimeSecs = 0.2;
+isiTimeFrames = round(isiTimeSecs / ifi);
 
 % Frames to wait before redrawing
 waitframes = 1;
@@ -241,10 +231,10 @@ waitframes = 1;
 % Define the keyboard press
 
 % Exit/reset key
-esc = KbName('ESCAPE');
+    esc = KbName('ESCAPE');
 
-% Detection Response L/R Circle
-    % Which cirlce have the gap?
+% Detection Response L/R Circle (Valid vs Invalid)
+    % Circle appear left/right?
     locL = KbName('4$');
     locR = KbName('5%');
 
@@ -331,24 +321,54 @@ for trial = 1:numTrials
     % Cue and target position
     cuePos = combinedTrialsShuff(1, trial);
     targetPos = combinedTrialsShuff(2, trial);
+    trialType = combinedTrialsShuff(3, trial);
 
-    % Logic to assign the correct position to the cue and target
+    % Assign the correct cue position
     if cuePos == 0
-        cueRect = left;
+        colour = colourL;
+        pointList = pointListL;
     elseif cuePos == 1
-        cueRect = right;
+        colour = colourR;
+        pointList = pointListR;
+    elseif cuePos == 2
+        colour = colourNC;
+        pointList = pointListNC;
     end
+    % Screen('FramePoly', window, colour, pointList, penWidth);
 
-    if targetPos == 0 || 1 || 2 || 3
-        targetRect = left;
-    elseif targetPos == 4 || 5 || 6 || 7
-        targetRect = rightRect;
+    % Assign the correct gap position
+    if gapPos == 0
+        loc = loc1;
+    elseif gapPos == 1
+        loc = loc2;
+    elseif gapPos == 2
+        loc = loc3;
+    elseif gapPos == 3
+        loc = loc4;
+    elseif gapPos == 4
+        loc = loc5;
+    elseif gapPos == 5
+        loc = loc6;
+    elseif gapPos == 6
+        loc = loc7;
+    elseif gapPos == 7
+        loc = loc8;
     end
+    % Screen('FillArc', window, grey, left, loc, gapDist);
 
-    % Set the blend funciton for a nice antialiasing
-    Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    % Assign Trial Condition
+    if trialType == 0
+        gratContrast = 0;
+    elseif trialType == 1
+        gratContrast = 1;
+    end
+    % Screen('DrawTexture', window, texture, [], left, angle, [], [], grey, [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
 
-    % If this is the first trial we present a start screen and wait for a key-press
+
+    % % Set the blend funciton for a nice antialiasing
+    % Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    % Welcome Screen
     if trial == 1
 
         % Draw the instructions
@@ -370,24 +390,24 @@ for trial = 1:numTrials
         % Flip the screen grey
         Screen('FillRect', window, grey);
         vbl = Screen('Flip', window);
-        WaitSecs(0.5);
+        % WaitSecs(0.5);
 
     end
 
+    % Instructional Screen 1
     if trial == 1
 
         % Draw the instructions        
-        openingLine1 = 'Any of the following central visual cues will manifest along the trial:';
-        img = imread('C:\Users\Leonardo\Documents\NTU\Task Pics\Diamonds.png');
-        imgTexture = Screen('MakeTexture', window, img);
-        Screen('DrawTexture', window, imgTexture);
-        openingLine2 = '\n\n if left side of diamond turns green (1), you must deploy to your attention to the left side of the screen';
-        openingLine3 = '\n if right side of diamond turns green (2), you must deploy to your attention to the right of side the screen';
-        openingLine4 = '\n if both sides of diamond turns green (3), you must deploy to your attention to both sides the screen';
-        openingLine5 = '\n\n REMEMBER!';
-        openingLine6 = '\n Always fixate your eyes on the central cross while your attention is deployed';
+        openingLine1 = '\n\n\n\n Any of the following central visual cues will manifest along the trial:';
+        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
+        Screen('FramePoly', window, colourFD, pointListFD, penWidth);
+        Screen('FramePoly', window, colourL, pointListL, penWidth);
+        openingLine2 = '\n\n\n\n\n Left side of diamond turns green';
+        openingLine3 = '\n Deploy to your attention to the left of side the screen!';
+        openingLine4 = '\n\n REMEMBER!';
+        openingLine5 = '\n Always fixate your eyes on the central cross while your attention is deployed';
         Screen('TextSize', window, 60);
-        DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
+        DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5], 'center', 'center', black);
 
 
         % Flip to the screen
@@ -399,12 +419,98 @@ for trial = 1:numTrials
         % Flip the screen grey
         Screen('FillRect', window, grey);
         vbl = Screen('Flip', window);
-        WaitSecs(0.5);
+        % WaitSecs(0.5);
 
     end
 
+    % Instructional Screen 2
+    if trial == 1
+
+        % Draw the instructions        
+        openingLine1 = '\n\n\n\n Any of the following central visual cues will manifest along the trial:';
+        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2);
+        Screen('FramePoly', window, colourFD, pointListFD, penWidth);
+        Screen('FramePoly', window, colourR, pointListR, penWidth);
+        openingLine2 = '\n\n\n\n\n Right side of diamond turns green';
+        openingLine3 = '\n Deploy to your attention to the right of side the screen!';
+        openingLine4 = '\n\n REMEMBER!';
+        openingLine5 = '\n Always fixate your eyes on the central cross while your attention is deployed';
+        Screen('TextSize', window, 60);
+        DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5], 'center', 'center', black);
 
 
+        % Flip to the screen
+        Screen('Flip', window);
+
+        % Wait for a key press
+        KbStrokeWait(-1);
+
+        % Flip the screen grey
+        Screen('FillRect', window, grey);
+        vbl = Screen('Flip', window);
+        % WaitSecs(0.5);
+
+    end
+
+    % Set the blend funciton for a nice antialiasing
+    Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    % Present FC + FD
+    for i = 1:fixTimeFrames
+        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
+        % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+        % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+        vbl = Screen('Flip', window);
+    end
+
+    % Present the FC + Spatial Cue (SC)
+    for i = 1:cueTimeFrames
+        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
+        Screen('FramePoly', window, colour, pointList, penWidth); % Spatial Cue
+        % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+        % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+    end
+    
+    % Present the FC + SC + Target
+    for i = 1:cueTimeFrames
+        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
+        Screen('FramePoly', window, colour, pointList, penWidth); % Spatial Cue
+        % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+        % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+    end
+
+    while vbl < tstart + showTime
+        
+        % Re-set alpha blending
+        Screen('BlendFunction', window, 'GL_DST_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+        
+        % fixations
+        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % Spatial Cue
+        Screen('FramePoly', window, colourR, pointListR, penWidth);
+    
+        % bilateral rings (W/O Gap)
+        Screen('FrameOval', window, black, left, ringThickness, [], []);
+        Screen('FrameOval', window, black, right, ringThickness, [], []);
+    
+        % Left gap
+        Screen('FillArc', window, grey, left, loc1, gapDist);
+        vbl = Screen('Flip', window, vbl + 0.5 * ifi,0);
+       
+        Screen('BlendFunction', window, 'GL_ONE', 'GL_ZERO');
+        
+        % Grating (change to leftG/rightG = exact radius)
+        Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+        Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+	    phase = phase + phaseJump;
+	    vbl = Screen('Flip', window, vbl + 0.5 * ifi,0);	
+    
+    end
 end
 
 
