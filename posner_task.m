@@ -198,30 +198,30 @@ gapDist = 30;
 
 % Fixation (Baseline) point time in seconds and frames (2-3 secs)
 fixTimeSecs = 2;
-fixTimeFrames = round(fixTimeSecs / ifi);
+fixTimeFrames = fixTimeSecs / ifi;
 
 % Spatial Cue (Attention Deployment) point time in seconds and frames (1-1.5 secs)
 cueTimeSecs = 1;
-cueTimeFrames = round(cueTimeSecs / ifi);
+cueTimeFrames = cueTimeSecs / ifi;
 
 % Target (Onset) point time in seconds and frames (0.1 secs)
 tOnsetTimeSecs = 0.1;
-targetTimeFrames = round(tOnsetTimeSecs / ifi);
+tOnsetTimeFrames = tOnsetTimeSecs / ifi;
 
 % Target (Detection) point time in seconds and frames (1-1.5 secs - lapse time if no response)
 tDetectionTimeSecs = 0.15;
-targetTimeFrames = round(tDetectionTimeSecs / ifi);
+tDetectionTimeFrames = tDetectionTimeSecs / ifi;
 
 % Target (Precision Gap) point time in seconds and frames (0.1 secs);
 % Wait for Gap location Response, then cont. to next trial
 
-% Time between the cue and the target
-cueTargetTimeSecs = 0.3;
-cueTargetTimeFrames = round(isiTimeSecs / ifi);
-
 % Intertrial interval time
 isiTimeSecs = 0.2;
-isiTimeFrames = round(isiTimeSecs / ifi);
+isiTimeFrames = isiTimeSecs / ifi;
+
+% Time between the cue and the target
+cueTargetTimeSecs = 0.3;
+cueTargetTimeFrames = isiTimeSecs / ifi;
 
 % Frames to wait before redrawing
 waitframes = 1;
@@ -235,23 +235,23 @@ waitframes = 1;
 
 % Detection Response L/R Circle (Valid vs Invalid)
     % Circle appear left/right?
-    locL = KbName('4$');
-    locR = KbName('5%');
+    locL = KbName('g');
+    locR = KbName('h');
 
 % Precision Response Gap Location
     % Left circle gap locations
-    loc1 = KbName('1!');
-    loc2 = KbName('2@');
-    loc3 = KbName('3#');
-    loc4 = KbName('4$');
+    loc1Res = KbName('s');
+    loc2Res = KbName('e');
+    loc3Res = KbName('r');
+    loc4Res = KbName('g');
     % Right circle gap locations
-    loc5 = KbName('5%');
-    loc6 = KbName('6^');
-    loc7 = KbName('7&');
-    loc8 = KbName('8*');
+    loc5Res = KbName('h');
+    loc6Res = KbName('u');
+    loc7Res = KbName('i');
+    loc8Res = KbName('l');
 
 % Hide the mouse cursor
-% HideCursor;
+HideCursor;
 
 %% ---------------------- Procedure ----------------------
 
@@ -304,7 +304,6 @@ numTrials = size(combinedTrialsShuff, 2); % for for loops
 % location choice. We preallocate the matrix with nans.
 dataMat = nan(numTrials, 2); % sama ini juga simpen
 
-
 %% ------------------------ Loop -------------------------
 % Draw the fixation cross in black, set it to the center of our screen and
 % % set good quality antialiasing
@@ -320,10 +319,10 @@ for trial = 1:numTrials
 
     % Cue and target position
     cuePos = combinedTrialsShuff(1, trial);
-    targetPos = combinedTrialsShuff(2, trial);
+    gapLoc = combinedTrialsShuff(2, trial);
     trialType = combinedTrialsShuff(3, trial);
 
-    % Assign the correct cue position
+    % Assign the correct cue position (left vs right)
     if cuePos == 0
         colour = colourL;
         pointList = pointListL;
@@ -336,27 +335,36 @@ for trial = 1:numTrials
     end
     % Screen('FramePoly', window, colour, pointList, penWidth);
 
-    % Assign the correct gap position
-    if gapPos == 0
+    % Assign the correct gap location
+    if gapLoc == 0
         loc = loc1;
-    elseif gapPos == 1
+        leftright = left;
+    elseif gapLoc == 1
         loc = loc2;
-    elseif gapPos == 2
+        leftright = left;
+    elseif gapLoc == 2
         loc = loc3;
-    elseif gapPos == 3
+        leftright = left;
+    elseif gapLoc == 3
         loc = loc4;
-    elseif gapPos == 4
+        leftright = left;
+    elseif gapLoc == 4
         loc = loc5;
-    elseif gapPos == 5
+        leftright = right;
+    elseif gapLoc == 5
         loc = loc6;
-    elseif gapPos == 6
+        leftright = right;
+    elseif gapLoc == 6
         loc = loc7;
-    elseif gapPos == 7
+        leftright = right;
+    elseif gapLoc == 7
         loc = loc8;
+        leftright = right;
     end
+
     % Screen('FillArc', window, grey, left, loc, gapDist);
 
-    % Assign Trial Condition
+    % Assign Trial Condition (NoStim vs Gratings)
     if trialType == 0
         gratContrast = 0;
     elseif trialType == 1
@@ -455,64 +463,189 @@ for trial = 1:numTrials
     % Set the blend funciton for a nice antialiasing
     Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    % Present FC + FD
+     % Present FC + FD -----> Fixation Time Window
     for i = 1:fixTimeFrames
-        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
-        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
-        % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
-        % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
-        vbl = Screen('Flip', window);
+
+        Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        % while vbl < tstart + fixTimeFrames
+            Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+            Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
+            % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % phase = phase + phaseJump;
+            vbl = Screen('Flip', window);
+        % end
     end
 
-    % Present the FC + Spatial Cue (SC)
+    % Present the FC + Spatial Cue (SC) -----> Attention Time Window
     for i = 1:cueTimeFrames
-        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
-        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
-        Screen('FramePoly', window, colour, pointList, penWidth); % Spatial Cue
-        % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
-        % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
-        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+
+        Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        % while vbl > i
+            Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+            Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
+            Screen('FramePoly', window, colour, pointList, penWidth); % Spatial Cue
+            % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % phase = phase + phaseJump;
+            vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+        % end
+    end
+
+    % Present the FC + SC + Target Onset -----> Target Onset Time Window
+    for i = 1:tOnsetTimeFrames
+
+        Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        % while vbl < tstart + tOnsetTimeFrames
+            Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+            Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
+            Screen('FramePoly', window, colour, pointList, penWidth); % Spatial Cue
+            Screen('FrameOval', window, black, left, ringThickness, [], []); % ring
+            Screen('FrameOval', window, black, right, ringThickness, [], []); % ring
+            Screen('FillArc', window, grey, leftright, loc, gapDist); % gap
+            % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % phase = phase + phaseJump;
+            vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+        % end
+    end
+
+    % Present the FC + SC + Target Detection -----> Target Detection Time Window
+    for i = 1:tDetectionTimeSecs
+
+        Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        % while vbl < tstart + showTime
+            Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+            Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
+            Screen('FramePoly', window, colour, pointList, penWidth); % Spatial Cue
+            Screen('FrameOval', window, black, left, ringThickness, [], []); % ring
+            Screen('FrameOval', window, black, right, ringThickness, [], []); % ring
+            Screen('FillArc', window, grey, leftright, loc, gapDist); % gap
+            % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
+            % phase = phase + phaseJump;
+            vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+        % end
+    end
+
+    % while vbl < tstart + showTime
+    % 
+    %     % Re-set alpha blending
+    %     Screen('BlendFunction', window, 'GL_DST_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+    % 
+    %     % fixations
+    %     Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
+    %     Screen('FramePoly', window, colourFD, pointListFD, penWidth); % Spatial Cue
+    %     Screen('FramePoly', window, colourR, pointListR, penWidth);
+    % 
+    %     % bilateral rings (W/O Gap)
+    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
+    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
+    % 
+    %     % Left gap
+    %     Screen('FillArc', window, grey, left, loc1, gapDist);
+    %     vbl = Screen('Flip', window, vbl + 0.5 * ifi,0);
+    % 
+    %     Screen('BlendFunction', window, 'GL_ONE', 'GL_ZERO');
+    % 
+    %     % Grating (change to leftG/rightG = exact radius)
+    %     Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+    %     Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+	%     phase = phase + phaseJump;
+	%     vbl = Screen('Flip', window, vbl + 0.5 * ifi,0);	
+    % 
+    % end
+
+    % Response
+    respToBeMade = true;
+    startResp = GetSecs;
+    while respToBeMade
+        [keyIsDown,secs, keyCode] = KbCheck(-1);
+        if keyCode(esc)
+            ShowCursor;
+            sca;
+            return
+        elseif keyCode(loc1Res)
+            response = 0;
+            respToBeMade = false;
+        elseif keyCode(loc2Res)
+            response = 1;
+            respToBeMade = false;
+        elseif keyCode(loc3Res)
+            response = 2;
+            respToBeMade = false;
+        elseif keyCode(loc4Res)
+            response = 3;
+            respToBeMade = false;
+        elseif keyCode(loc5Res)
+            response = 4;
+            respToBeMade = false;
+        elseif keyCode(loc6Res)
+            response = 5;
+            respToBeMade = false;
+        elseif keyCode(loc7Res)
+            response = 6;
+            respToBeMade = false;
+        elseif keyCode(loc8Res)
+            response = 7;
+            respToBeMade = false;
+        end
+    end
+    endResp = GetSecs;
+    rt = endResp - startResp;
+
+    % Work out if the location of the gap was identified correctly
+    if gapLoc == response
+        correctness = 1; % 1 = correct response
+    elseif gapLoc ~= response
+        correctness = 0; % 0 = incorrect response
     end
     
-    % Present the FC + SC + Target
-    for i = 1:cueTimeFrames
-        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
-        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % FD
-        Screen('FramePoly', window, colour, pointList, penWidth); % Spatial Cue
-        % Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
-        % Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
+    % Clear the screen ready for a response
+    Screen('FillRect', window, grey);
+    vbl = Screen('Flip', window, vbl + (1 - 0.5) * ifi);
+
+    % Save out the data after having added the data to the data matrix. We
+    % save to the same directory as the code as a tab dilimited text file
+    dataMat(trial, :) = [rt correctness];
+    writematrix(dataMat, [cd filesep 'testrun.txt'], 'Delimiter', '\t')
+
+    % Inter trial interval black screen. Note that the timestamp for the
+    % initial frame will be missed due to the first vbl being "old" due to
+    % the response loop. I leave it as an excercise to the reader as to how
+    % one could fix this simply.
+    for i = 1:isiTimeFrames
+        Screen('FillRect', window, grey);
         vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
     end
 
-    while vbl < tstart + showTime
-        
-        % Re-set alpha blending
-        Screen('BlendFunction', window, 'GL_DST_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
-        
-        % fixations
-        Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter], 2); % Cross
-        Screen('FramePoly', window, colourFD, pointListFD, penWidth); % Spatial Cue
-        Screen('FramePoly', window, colourR, pointListR, penWidth);
-    
-        % bilateral rings (W/O Gap)
-        Screen('FrameOval', window, black, left, ringThickness, [], []);
-        Screen('FrameOval', window, black, right, ringThickness, [], []);
-    
-        % Left gap
-        Screen('FillArc', window, grey, left, loc1, gapDist);
-        vbl = Screen('Flip', window, vbl + 0.5 * ifi,0);
-       
-        Screen('BlendFunction', window, 'GL_ONE', 'GL_ZERO');
-        
-        % Grating (change to leftG/rightG = exact radius)
-        Screen('DrawTexture', window, texture, [], left, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
-        Screen('DrawTexture', window, texture, [], right, angle, [], [], [], [], [], [phase, radialFrequency, contrast, sigma, circularFrequency, 0, 0, 0]);
-	    phase = phase + phaseJump;
-	    vbl = Screen('Flip', window, vbl + 0.5 * ifi,0);	
-    
+    % If this is the last trial we present screen saying that the experimet
+    % is over.
+    Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if trial == numTrials
+
+        % Draw the instructions: in reality the person could press any of
+        % the listened to keys to exist. But they do not know that.
+        DrawFormattedText(window, 'Trial Finished! press ESCAPE to exit', 'center', 'center', black);
+
+        % Flip to the screen
+        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+
+        % Wait for a key press
+        KbStrokeWait(-1);
+
     end
+
+
 end
 
+% Done! Clear up and leave the building
+disp('Experiment Finished')
+sca
 
 
 
