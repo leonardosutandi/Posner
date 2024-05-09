@@ -328,7 +328,7 @@ baseMatVal = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
               0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1];    % Stim Condition
 
 % For 64 valid trials (80% of Spatial Cue Condition) = 16 valid combination * 4
-numRepsVal = 4; 
+numRepsVal = 0; 
 cueTargetMatVal = repmat(baseMatVal, 1, numRepsVal);
 
 % Invalid
@@ -336,7 +336,7 @@ baseMatInv = [0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1; ... % Spatial Cue
               4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3; ... % Gap Loc
               0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1];    % Stim Condition
 % For 16 invalid trials (20% of Spatial Cue Condition) = 16 invalid combination * 1
-numRepsInv = 1;
+numRepsInv = 0;
 cueTargetMatInv = repmat(baseMatInv, 1, numRepsInv);
 
 % Neutral
@@ -848,42 +848,48 @@ for trial = 1:numTrials
     Screen('FillRect', window, grey);
     vbl = Screen('Flip', window, vbl + (1 - 0.5) * ifi);
 
-% Save out the data after having added the data to the data matrix. We
-    % save to the same directory as the code as a tab dilimited text file
+% ---------------------------- SAVE DATA --------------------------------------
+    % Put label and responses to a matrix
     dataMat(trial, :) = [validity rt correctDet correctAcc];
-    writematrix(dataMat, [cd filesep 'PosTrial_ID_X.txt'], 'Delimiter', '\t')
+    
+    % save matrix to csv to different folder in the same directory (\t = 1 column)
+    % results\BEH or EEG\UNIQUE_ID\trial_X.csv
+    writematrix(dataMat, [cd filesep 'results\BEH\SLI000\trial_1.csv'], 'Delimiter', ',')
 
-    % Inter trial interval black screen. Note that the timestamp for the
-    % initial frame will be missed due to the first vbl being "old" due to
-    % the response loop. I leave it as an excercise to the reader as to how
-    % one could fix this simply.
-    for i = 1:isiTimeFrames
-        Screen('FillRect', window, grey);
-        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
-    end
-
-    % If this is the last trial we present screen saying that the experimet
-    % is over.
-    Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    if trial == numTrials
-
-        % Draw the instructions: in reality the person could press any of
-        % the listened to keys to exist. But they do not know that.
-        DrawFormattedText(window, 'Trial Finished! press ESCAPE to exit', 'center', 'center', black);
-
-        % Flip to the screen
-        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
-
-        % Wait for a key press
-        KbStrokeWait(-1);
-
-    end
+    % % Inter trial interval black screen. Note that the timestamp for the
+    % % initial frame will be missed due to the first vbl being "old" due to
+    % % the response loop. I leave it as an excercise to the reader as to how
+    % % one could fix this simply.
+    % for i = 1:isiTimeFrames
+    %     Screen('FillRect', window, grey);
+    %     vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+    % end
+    % 
+    % % If this is the last trial we present screen saying that the experimet
+    % % is over.
+    % Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    % if trial == numTrials
+    % 
+    %     % Draw the instructions: in reality the person could press any of
+    %     % the listened to keys to exist. But they do not know that.
+    %     DrawFormattedText(window, 'Trial Finished! press ESCAPE to exit', 'center', 'center', black);
+    % 
+    %     % Flip to the screen
+    %     vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+    % 
+    %     % Wait for a key press
+    %     KbStrokeWait(-1);
+    % 
+    % end
 
 
 end
 
 %% ------------------------ End -------------------------
-disp('Experiment Finished');
+DrawFormattedText(window, 'Finished! Press any Key.', 'center', 'center', black);
+Screen('DrawingFinished', window); 
+Screen('Flip', window);
+KbStrokeWait(-1);
 sca
 
 
