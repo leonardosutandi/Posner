@@ -1,10 +1,13 @@
-
-
 %% ------------------- Set Workspace ---------------------
 
 close all;
 clear;
 sca;
+
+%ID
+group = input('Group (C / MA / MO): ', 's');
+id = input('Unique id (in CAPS): ', 's');
+blockNum = input('Block number: ', 's');
 
 % Set-Up Screen Parematers
 ScreenSetUp;
@@ -13,7 +16,7 @@ ScreenSetUp;
 % fc: fixation cross
 
 % Set arms length
-fcArms = 10; % 6
+fcArms = 6; % 6; 10
 
 % Set cross coordinates
 xCoords_fc = [-fcArms fcArms 0 0];
@@ -21,7 +24,7 @@ yCoords_fc = [0 0 -fcArms fcArms];
 CrossCoords = [xCoords_fc; yCoords_fc];
 
 % Set cross width
-fcWidth = 4; % 2
+fcWidth = 2; % 2; 4
 
 % Draw the fixation cross in black, set it to the center of our screen and
 % set good quality antialiasing
@@ -32,9 +35,9 @@ fcWidth = 4; % 2
 % x = xCenter;
 % y = yCenter;
 
-polyWidth = 125; % 65
-polyHeight = 125; % 65
-penWidth = 50; % 5
+polyWidth = 65; % 65; 125
+polyHeight = 65; % 65; 125
+penWidth = 5; % 5; 50
 
 % Abbr. for the cues below:
     % FD: Fixation Diamond
@@ -109,8 +112,8 @@ colourNC = green;
 %% ------------- Bilateral Target Parameters --------------
 
 % Set the parameters for the Landolt C + Gratings
-innerRadius = 250; % Radius of the ring 125
-ringThickness = 20; % Thickness of the ring 10
+innerRadius = 125; % Radius of the ring 125; 250
+ringThickness = 10; % Thickness of the ring 10; 20
 totalRadius = innerRadius + ringThickness;
 
 % Define Left & Right Positioning of Stimuli (+ 2 ring overlap perfectly
@@ -214,7 +217,7 @@ angle = 0;
 phase = 0;
 
 % spatial frequency
-frequency = 0.04; % cycles/pixel % 0.08
+frequency = 0.08; % cycles/pixel % 0.08; 0.04
 
 % calculate frequency of both radial and circular gratings
 % 2*pi = 360 degrees
@@ -257,11 +260,13 @@ right = [xCenter*1.5 - totalRadius, yCenter/0.75 - totalRadius, ...
 % Fixation (Baseline) point time in seconds and frames (2-3 secs)
 fixTimeSecs1 = 2;
 fixTimeFrames1 = fixTimeSecs1/ifi;
-fixTimeSecs2 = 3;
+fixTimeSecs2 = 2.5;
 fixTimeFrames2 = fixTimeSecs2/ifi;
-% For 96 trials = 2 Time Jitter * 48
-baseMatFixTimeSecs = [0 1];
-numRepsFixTimeSecs = 48; 
+fixTimeSecs3 = 3;
+fixTimeFrames3 = fixTimeSecs3/ifi;
+% For 96 trials = 3 Time Jitter * 32
+baseMatFixTimeSecs = [0 1 2];
+numRepsFixTimeSecs = 32; 
 fixTimeFramesMat = repmat(baseMatFixTimeSecs, 1, numRepsFixTimeSecs);
 % Randomise
 cols1 = size(fixTimeFramesMat, 2);
@@ -269,13 +274,15 @@ randCol1 = randperm(cols1);
 fixTimeFramesJitter = fixTimeFramesMat(:, randCol1);
 
 % Spatial Cue (Attention Deployment) point time in seconds and frames (1-1.5 secs)
-cueTimeSecs1 = 2;
+cueTimeSecs1 = 1;
 cueTimeFrames1 = cueTimeSecs1/ifi;
-cueTimeSecs2 = 2.5;
+cueTimeSecs2 = 1.25;
 cueTimeFrames2 = cueTimeSecs2/ifi;
-% For 96 trials = 2 Time Jitter * 48
-baseMatCueTimeSecs = [0 1];
-numRepsCueTimeSecs = 48; 
+cueTimeSecs3 = 1.5;
+cueTimeFrames3 = cueTimeSecs3/ifi;
+% For 96 trials = 3 Time Jitter * 32
+baseMatCueTimeSecs = [0 1 2];
+numRepsCueTimeSecs = 32; 
 cueTimeFramesMat = repmat(baseMatCueTimeSecs, 1, numRepsCueTimeSecs);
 % Randomise
 cols2 = size(cueTimeFramesMat, 2);
@@ -283,11 +290,11 @@ randCol2 = randperm(cols2);
 cueTimeFramesJitter = cueTimeFramesMat(:, randCol2);
 
 % Target (On/offset) point time in seconds and frames (0.1 secs)
-tOnOffsetTimeSecs = 1;
+tOnOffsetTimeSecs = 0.1;
 tOnOffsetTimeFrames = tOnOffsetTimeSecs/ifi;
 
 % Target (Detection) point time in seconds and frames (1-1.5 secs - lapse time if no response)
-tDetectionTimeSecs = 0.2;
+tDetectionTimeSecs = 0.1;
 tDetectionTimeFrames = tDetectionTimeSecs/ifi;
 
 % Target (Detection Question) point time in seconds and frames
@@ -334,14 +341,6 @@ waitframes = 1;
 
 % Hide the mouse cursor
 HideCursor;
-
-% %Set up the parallel port
-% port=serialportlist;
-% com = IOPort('OpenSerialPort', char(port(2)), 'DTR=1');
-% %start the thing saving automatically?
-% IOPort('Write', com, uint8(254));
-% WaitSecs(0.004);
-% IOPort('Write', com, uint8(0));
 
 %% ---------------------- Procedure ----------------------
 
@@ -390,9 +389,19 @@ combinedTrialsShuff = combinedTrials(:, randCol);
 % Total number of trials
 numTrials = size(combinedTrialsShuff, 2); % for for loops
 
-% Create response matrix to save trial type (validity), RT, detection
+% Create blank (at this point) response matrix to save trial type (validity), RT, detection
 % correction, and accuracy
-dataMatPrimary = nan(numTrials, 10); % sama ini juga simpen
+dataMatPrimary = nan(numTrials, 11);
+
+%% ------------------- Trigger Start ---------------------
+
+% Set up the parallel port (Trigger)
+port=serialportlist;
+com = IOPort('OpenSerialPort', char(port(2)), 'DTR=1');
+% Start labelling triggers
+IOPort('Write', com, uint8(254));
+WaitSecs(0.004);
+IOPort('Write', com, uint8(0));
 
 %% ------------------------ Loop -------------------------
 
@@ -407,13 +416,16 @@ for trial = 1:numTrials
     fixJit = fixTimeFramesJitter(1, trial);
     cueJit = cueTimeFramesJitter(1, trial);
 
-    % Assign timing for jitter
+    % Assign timing jitter
     if fixJit == 0
         fixTimeFrames = fixTimeFrames1;
         fixJitData = 0;
     elseif fixJit == 1
         fixTimeFrames = fixTimeFrames2;
         fixJitData = 1;
+    elseif fixJit == 2
+        fixTimeFrames = fixTimeFrames3;
+        fixJitData = 2;
     end
 
     if cueJit == 0
@@ -422,6 +434,9 @@ for trial = 1:numTrials
     elseif cueJit == 1
         cueTimeFrames = cueTimeFrames2;
         cueJitData = 1;
+    elseif cueJit == 2
+        cueTimeFrames = cueTimeFrames3;
+        cueJitData = 2;
     end
 
     % Cue and target position
@@ -446,489 +461,58 @@ for trial = 1:numTrials
     if gapLoc == 0
         loc = loc1; % change loc in loop accordaing to locX (e.g. if gapLoc = 0; loc = loc1
         leftright = left2; % where should the gap appear according to gap (e.g. if loc1 = always left)
-        locVal = 0; % 0 = left; 1 = right; setting every gap on the left/right as 0/1
+        targetLR = 0; % 0 = left; 1 = right; setting every gap on the left/right as 0/1
     elseif gapLoc == 1
         loc = loc2;
         leftright = left2;
-        locVal = 0;
+        targetLR = 0;
     elseif gapLoc == 2
         loc = loc3;
         leftright = left2;
-        locVal = 0;
+        targetLR = 0;
     elseif gapLoc == 3
         loc = loc4;
         leftright = left2;
-        locVal = 0;
+        targetLR = 0;
     elseif gapLoc == 4
         loc = loc5;
         leftright = right2;
-        locVal = 1;
+        targetLR = 1;
     elseif gapLoc == 5
         loc = loc6;
         leftright = right2;
-        locVal = 1;
+        targetLR = 1;
     elseif gapLoc == 6
         loc = loc7;
         leftright = right2;
-        locVal = 1;
+        targetLR = 1;
     elseif gapLoc == 7
         loc = loc8;
         leftright = right2;
-        locVal = 1;
+        targetLR = 1;
     end
     % Screen('FrameArc', window, grey, left, loc, gapDist, ringThickness, ringThickness);
 
+    % Between trial interval
+    WaitSecs(1);
+
     % Assign Trial Condition (NoGratings vs Gratings)
-    if trialType == 0
-        gratContrast = 0; % NoGratings trial
-        ringContrast = 1; % also set the contrast (value must be the same)
-    elseif trialType == 1
-        gratContrast = 1; 
+    if trialType == 0 % NoGratings trial
+        gratContrast = 0; % Set gratings contrast accordingly
+        ringContrast = 1; % also set the contrast (value must be the same for rings)
+    elseif trialType == 1 % Gratings trial
+        gratContrast = 0.7; 
         ringContrast = 1;
     end
 
-    % Screen('DrawTexture', window, texture, [], left, angle, [], [], grey, [], [], [phase, radialFrequency, gratContrast, sigma, circularFrequency, 0, 0, 0]);
-
-    % % Set the blend funciton for a nice antialiasing
-    % Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    % txtSize = 38; % 24
-    % % Welcome Screen
-    % if trial == 1
-    % 
-    %     % Draw the instructions
-    %     openingLine1 = 'Welcome! the purpose of this study is to assess how the neural oscillations,';
-    %     openingLine2 = '\n or how the brain communicates, differ between migraineurs and non-migraineurs.';
-    %     openingLine3 = '\n You will be presented with centrally fixated visual cues, indicating';
-    %     openingLine4 = '\n which visual field (left or right) to covertly atttend to';
-    %     openingLine5 = '\n (without moving your eyes) to identify a visual target.';
-    %     openingLine6 = '\n\n Press any key to continue.';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 1 (Fixation)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = '\n\n\n\n\n\n At the beginning of each trial, you must FIXATE your eyes on this central cross:';
-    %     Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter*.95], 2);
-    %     Screen('FramePoly', window, colourFD, pointListFD, penWidth);
-    %     openingLine2 = '\n\n\n\n\n after some time, the diamond will change colour, instructing you to';
-    %     openingLine3 = '\n  shift your attention to the LEFT, RIGHT, or BOTH sides of the screen without moving your eyes';
-    %     openingLine4 = '\n\n This indicates a target will or most likely appear on that relevant side';
-    %     openingLine5 = '\n\n REMEMBER!';
-    %     openingLine6 = '\n Always fixate your eyes on the central cross while you shift your attention.';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 2 (Left Cue)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = '\n\n\n\n\n\n Any of the following central visual cues will manifest along the trial:';
-    %     Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter*.95], 2);
-    %     Screen('FramePoly', window, colourFD, pointListFD, penWidth);
-    %     Screen('FramePoly', window, colourL, pointListL, penWidth);
-    %     openingLine2 = '\n\n\n\n\n if the LEFT side of diamond turns green,';
-    %     openingLine3 = '\n shift your attention to the LEFT side of the screen!';
-    %     openingLine4 = '\n\n This indicate a target will most likely appear on the LEFT.';
-    %     openingLine5 = '\n\n REMEMBER!';
-    %     openingLine6 = '\n Always fixate your eyes on the central cross while you shift your attention.';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 3 (Right Cue)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = '\n\n\n\n\n\n Any of the following central visual cues will manifest along the trial:';
-    %     Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter*.95], 2);
-    %     Screen('FramePoly', window, colourFD, pointListFD, penWidth);
-    %     Screen('FramePoly', window, colourR, pointListR, penWidth);
-    %     openingLine2 = '\n\n\n\n\n if the RIGHT side of diamond turns green,';
-    %     openingLine3 = '\n shift your attention to the RIGHT side of the screen!';
-    %     openingLine4 = '\n\n This indicate a target will most likely appear on the RIGHT.';
-    %     openingLine5 = '\n\n REMEMBER!';
-    %     openingLine6 = '\n Always fixate your eyes on the central cross while you shift your attention.';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 4 (Neutral Cue)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = '\n\n\n\n\n\n Any of the following central visual cues will manifest along the trial:';
-    %     Screen('DrawLines', window, CrossCoords, fcWidth, black, [xCenter yCenter*.95], 2);
-    %     Screen('FramePoly', window, colourFD, pointListFD, penWidth);
-    %     Screen('FramePoly', window, colourNC, pointListNC, penWidth);
-    %     openingLine2 = '\n\n\n\n\n if BOTH sides of diamond turns green,';
-    %     openingLine3 = '\n shift your attention to both LEFT and RIGHT side of the screen!';
-    %     openingLine4 = '\n\n This indicate a target will appear on EITHER sides of the screen.';
-    %     openingLine5 = '\n\n REMEMBER!';
-    %     openingLine6 = '\n Always fixate your eyes on the central cross while you shift your.';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 openingLine6], 'center', 'center', black);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 5 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (1) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc1
-    %     Screen('FrameArc', window, grey, left, 200, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 6 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (2) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc2
-    %     Screen('FrameArc', window, grey, left, 240, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 7 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (3) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc3
-    %     Screen('FrameArc', window, grey, left, 280, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 8 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (4) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc4
-    %     Screen('FrameArc', window, grey, left, 320, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 9 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (5) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc5
-    %     Screen('FrameArc', window, grey, right, 20, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 10 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (6) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc6
-    %     Screen('FrameArc', window, grey, right, 60, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 11 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (7) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc7
-    %     Screen('FrameArc', window, grey, right, 100, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
-    % 
-    % % Instructional Screen 12 (Target)
-    % if trial == 1
-    % 
-    %     % Draw the instructions        
-    %     openingLine1 = 'The target will be A GAP on the outer ring of appearing BILATERAL RINGS';
-    %     openingLine2 = '\n While deploying your attention, you are instructed to respond (as fast as possible)';
-    %     openingLine3 = '\n to the appearing gap AND to identify the precise location of the gap.';
-    %     openingLine4 = '\n\n\n REMEMBER!';
-    %     openingLine5 = '\n Always fixate your eyes on the central cross while your attention is moved';
-    %     openingLine6 = '\n\n 8 Possible gap locations:';
-    %     openingLine7 = '\n Press the correct gap location (8) to proceed!';
-    %     openingLine8 = '\n\n\n\n\n\n\n\n\n\n\n\n\n';
-    %     Screen('TextSize', window, txtSize);
-    %     DrawFormattedText(window, [openingLine1 openingLine2 openingLine3 openingLine4 openingLine5 ...
-    %         openingLine6 openingLine7 openingLine8], 'center', 'center', black);
-    % 
-    %     % Left
-    %     Screen('FrameOval', window, black, left, ringThickness, [], []);
-    %     % Right
-    %     Screen('FrameOval', window, black, right, ringThickness, [], []);
-    % 
-    %     % loc8
-    %     Screen('FrameArc', window, grey, right, 140, gapDist, ringThickness, ringThickness);
-    % 
-    %     % Flip to the screen
-    %     Screen('Flip', window);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    %     % Flip the screen grey
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window);
-    %     % WaitSecs(0.5);
-    % 
-    % end
+    % Response (V/I/N - which validity was it)
+    if cuePos == 2
+        validity = 2; % neutral
+    elseif targetLR == cuePos
+        validity = 1; % valid
+    elseif targetLR ~= cuePos
+        validity = 0; % inval
+    end 
     
     % Pause Screen
     if trial == 1
@@ -964,6 +548,18 @@ for trial = 1:numTrials
         phase = phase + phaseJump;
         % Flip to screen
         vbl = Screen('Flip', window);
+        % Trigger (trial type + fixation label)
+        if i==1
+            if trialType == 0 % NoGrat
+                IOPort('Write', com, uint8(1)); % No Gratings
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif trialType == 1 % Grat
+                IOPort('Write', com, uint8(2)); % Gratings
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            end
+        end
     end
 
     % Present the FC + Spatial Cue (SC) -----> Attention Time Window
@@ -980,6 +576,23 @@ for trial = 1:numTrials
         phase = phase + phaseJump;
         % Flip to screen       
         vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+        % % Trigger (cue appearing label)
+        if i==1
+            if cuePos == 0 % Left
+               IOPort('Write', com, uint8(3)); % Left Cue
+               WaitSecs(0.004);
+               IOPort('Write', com, uint8(0));
+            elseif cuePos == 1 % Right
+               IOPort('Write', com, uint8(4)); % Right Cue
+               WaitSecs(0.004);
+               IOPort('Write', com, uint8(0));   
+            elseif cuePos == 2 % Neutral
+               IOPort('Write', com, uint8(5)); % Neutral Cue
+               WaitSecs(0.004);
+               IOPort('Write', com, uint8(0));
+            end
+        end
+
     end
 
     % Present the FC + SC + Target Onset -----> Target On/Offset Time Window
@@ -999,10 +612,47 @@ for trial = 1:numTrials
         Screen('FrameOval', window, [0 0 0 ringContrast], right2, ringThickness, [], []); % ring
         Screen('FrameArc', window, grey, leftright, loc, gapDist, ringThickness, ringThickness); % gap
         % Flip to screen       
-        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+        vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);        
+        % % Trigger (Gap appearance label)
+        if i==1
+            if gapLoc == 0 %(loc1)
+                IOPort('Write', com, uint8(6))
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif gapLoc == 1 %(loc2)
+                IOPort('Write', com, uint8(7));
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif gapLoc == 2 %(loc3)
+                IOPort('Write', com, uint8(8));
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif gapLoc == 3 %(loc4)
+                IOPort('Write', com, uint8(9));
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif gapLoc == 4 %(loc5)
+                IOPort('Write', com, uint8(10));
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif gapLoc == 5 %(loc6)
+                IOPort('Write', com, uint8(11));
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif gapLoc == 6 %(loc7)
+                IOPort('Write', com, uint8(12));
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            elseif gapLoc == 7 %(loc8)
+                IOPort('Write', com, uint8(13));
+                WaitSecs(0.004);
+                IOPort('Write', com, uint8(0));
+            end
+        end
     end
 
-    % Present the FC + SC + Target Detection -----> Target Detection Time Window
+
+    % Present the FC + SC + Target Detection -----> Target Detection Wait Time Window
     for i = 1:tDetectionTimeFrames
         % Set alpha blending
         Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1019,26 +669,10 @@ for trial = 1:numTrials
         Screen('FrameOval', window, [0 0 0 ringContrast], right2, ringThickness, [], []); % ring
         % Flip to screen       
         vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
+
     end
  
-    % Response (V/I/N - which validity was it)
-    % if cuePos == 0
-    %     cuePosVal = 0;
-    % elseif cuePos == 1
-    %     cuePosVal = 1;
-    % elseif cuePos == 2
-    %     cuePosVal = 2;
-    % end 
-
-    if cuePos == 2
-        validity = 2; % neutral
-    elseif locVal == cuePos
-        validity = 1; % valid
-    elseif locVal ~= cuePos
-        validity = 0; % inval
-    end 
-
-    % Response (Detection RT)
+    % Response (Detection)
     respToBeMade = true;
     startResp = GetSecs;
     while respToBeMade
@@ -1050,22 +684,41 @@ for trial = 1:numTrials
         elseif keyCode(locL)
             respDet = 0; % left
             respToBeMade = false;
+            % Trigger (detection response);
+            IOPort('Write', com, uint8(14)); % Detection Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(locR)
             respDet = 1; % right
             respToBeMade = false;
+            % Trigger (detection response);
+            IOPort('Write', com, uint8(14));  % Detection Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         end
     end
     endResp = GetSecs;
+    % Get detection reaction time
     rtDet = endResp - startResp;
 
-    % Response (Detection - correct/incorrect)
-    if respDet == locVal
+    % Response correctness
+    if respDet == targetLR
         correctDet = 1; % correct detection
-    elseif respDet ~= locVal
+        % Trigger (correct side response)
+        WaitSecs(0.1);
+        IOPort('Write', com, uint8(15)); % Correct Det
+        WaitSecs(0.004);
+        IOPort('Write', com, uint8(0));
+    elseif respDet ~= targetLR
         correctDet = 0; % incorrect detection
+        % Trigger (incorrect side response)
+        WaitSecs(0.1);
+        IOPort('Write', com, uint8(16)); % Incorrect Det
+        WaitSecs(0.004);
+        IOPort('Write', com, uint8(0));
     end
 
-    % Present Detection Question -----> Target Detection Question Time Window
+    % "Where is the gap" frame
     for i = 1:tAccTimeFrames
         % Set alpha blending
         Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1097,27 +750,59 @@ for trial = 1:numTrials
         elseif keyCode(loc1Res)
             respAcc = 0;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(loc2Res)
             respAcc = 1;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(loc3Res)
             respAcc = 2;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(loc4Res)
             respAcc = 3;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(loc5Res)
             respAcc = 4;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(loc6Res)
             respAcc = 5;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(loc7Res)
             respAcc = 6;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         elseif keyCode(loc8Res)
             respAcc = 7;
             respToBeMade = false;
+            % Trigger (accuracy press response)
+            IOPort('Write', com, uint8(17)); % Gap Key pressed
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
         end
     end
     endResp2 = GetSecs;
@@ -1125,8 +810,18 @@ for trial = 1:numTrials
 
     if gapLoc == respAcc
         correctAcc = 1; % 1 = correct response
+            % Trigger (Correct gap location)
+            WaitSecs(0.1);
+            IOPort('Write', com, uint8(18)); % Correct Loc
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
     elseif gapLoc ~= respAcc
         correctAcc = 0; % 0 = incorrect response
+            % Trigger (incorrect gap location)
+            WaitSecs(0.1);
+            IOPort('Write', com, uint8(19));  % Incorrect Loc
+            WaitSecs(0.004);
+            IOPort('Write', com, uint8(0));
     end
 
     % Clear the screen
@@ -1135,46 +830,23 @@ for trial = 1:numTrials
 
 % ---------------------------- SAVE DATA --------------------------------------
     % Put label and responses to a matrix
-    dataMatPrimary(trial, :) = [fixJitData cueJitData trialType cuePos gapLoc validity correctDet rtDet correctAcc rtAcc];
-    
-    % save matrix to csv to different folder in the same directory (\t = 1 column)
+    dataMatPrimary(trial, :) = [fixJitData cueJitData trialType cuePos targetLR gapLoc validity correctDet rtDet correctAcc rtAcc];
+    % Label the columns    
+    labels = {'fixJitData', 'cueJitData', 'trialType', 'cuePos', 'targetLR', 'gapLoc', 'validity', 'correctDet', 'rtDet', 'correctAcc', 'rtAcc'};
+    resultTable = array2table(dataMatPrimary, 'VariableNames', labels);
     % results\BEH or EEG\UNIQUE_ID\trial_X.csv
-    writematrix(dataMatPrimary, [cd filesep 'results\BEH\C\SLI000\trial_1.csv'], 'Delimiter', ',');
-
-    % % Inter trial interval black screen. Note that the timestamp for the
-    % % initial frame will be missed due to the first vbl being "old" due to
-    % % the response loop. I leave it as an excercise to the reader as to how
-    % % one could fix this simply.
-    % for i = 1:isiTimeFrames
-    %     Screen('FillRect', window, grey);
-    %     vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
-    % end
-    % 
-    % % If this is the last trial we present screen saying that the experimet
-    % % is over.
-    % Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    % if trial == numTrials
-    % 
-    %     % Draw the instructions: in reality the person could press any of
-    %     % the listened to keys to exist. But they do not know that.
-    %     DrawFormattedText(window, 'Trial Finished! press ESCAPE to exit', 'center', 'center', black);
-    % 
-    %     % Flip to the screen
-    %     vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
-    % 
-    %     % Wait for a key press
-    %     KbStrokeWait(-1);
-    % 
-    % end
-
+    % Set # of block
+    writetable(resultTable, ['results\BEH\' num2str(group) '\' num2str(id) '\block_ ' num2str(blockNum) '.csv']);
 
 end
 
-% %pause the recording
-% IOPort('Write', com, uint8(255));
-% 
-% %close the serial port
-% IOPort('Close', com);
+%% -------------------- Close Tigger --------------------
+% Pause recording
+IOPort('Write', com, uint8(255));
+% Close the serial port
+IOPort('Close', com);
+% Stop keyboard response
+ListenChar(0);
 
 %% ------------------------ End -------------------------
 DrawFormattedText(window, 'Finished! Press any Key to exit', 'center', 'center', black);
