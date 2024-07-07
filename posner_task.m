@@ -226,7 +226,7 @@ middleRadius = circleSize/2;
 middlePerimeter = 2*pi*middleRadius; % pixels
 radialFrequency = frequency*middlePerimeter / (2*pi); % cycles/degree, must be integral to avoid clip effect, corrected in the frag file
 circularFrequency = 0;
-
+what 
 % sigma < 0 is a sinusoid.
 sigma = 1;
 
@@ -257,37 +257,40 @@ right = [xCenter*1.5 - totalRadius, yCenter/0.75 - totalRadius, ...
         % Gap (L/R) accuracy
         % Gap (location) accuracy
 
+% Any Jitter
+J = 0.1 + ((0.5 - 0.1).* (rand));
+
 % Fixation (Baseline) point time in seconds and frames (2-3 secs)
-fixTimeSecs1 = 2;
+fixTimeSecs1 = 1.5;
 fixTimeFrames1 = fixTimeSecs1/ifi;
-fixTimeSecs2 = 2.5;
-fixTimeFrames2 = fixTimeSecs2/ifi;
-fixTimeSecs3 = 3;
-fixTimeFrames3 = fixTimeSecs3/ifi;
-% For 96 trials = 3 Time Jitter * 32
-baseMatFixTimeSecs = [0 1 2];
-numRepsFixTimeSecs = 32; 
-fixTimeFramesMat = repmat(baseMatFixTimeSecs, 1, numRepsFixTimeSecs);
-% Randomise
-cols1 = size(fixTimeFramesMat, 2);
-randCol1 = randperm(cols1);
-fixTimeFramesJitter = fixTimeFramesMat(:, randCol1);
+% fixTimeSecs2 = 1 + J;
+% fixTimeFrames2 = fixTimeSecs2/ifi;
+% % fixTimeSecs3 = 3;
+% % fixTimeFrames3 = fixTimeSecs3/ifi;
+% % For 96 trials = 2 Time Jitter * 48
+% baseMatFixTimeSecs = [0 1];
+% numRepsFixTimeSecs = 48; 
+% fixTimeFramesMat = repmat(baseMatFixTimeSecs, 1, numRepsFixTimeSecs);
+% % Randomise
+% cols1 = size(fixTimeFramesMat, 2);
+% randCol1 = randperm(cols1);
+% fixTimeFramesJitter = fixTimeFramesMat(:, randCol1);
 
 % Spatial Cue (Attention Deployment) point time in seconds and frames (1-1.5 secs)
-cueTimeSecs1 = 1;
+cueTimeSecs1 = 2;
 cueTimeFrames1 = cueTimeSecs1/ifi;
-cueTimeSecs2 = 1.25;
-cueTimeFrames2 = cueTimeSecs2/ifi;
-cueTimeSecs3 = 1.5;
-cueTimeFrames3 = cueTimeSecs3/ifi;
-% For 96 trials = 3 Time Jitter * 32
-baseMatCueTimeSecs = [0 1 2];
-numRepsCueTimeSecs = 32; 
-cueTimeFramesMat = repmat(baseMatCueTimeSecs, 1, numRepsCueTimeSecs);
-% Randomise
-cols2 = size(cueTimeFramesMat, 2);
-randCol2 = randperm(cols2);
-cueTimeFramesJitter = cueTimeFramesMat(:, randCol2);
+% cueTimeSecs2 = 2 + J; 
+% cueTimeFrames2 = cueTimeSecs2/ifi;
+% cueTimeSecs3 = 1.5;
+% cueTimeFrames3 = cueTimeSecs3/ifi;
+% For 96 trials = 2 Time Jitter * 48
+% baseMatCueTimeSecs = [0 1];
+% numRepsCueTimeSecs = 48; 
+% cueTimeFramesMat = repmat(baseMatCueTimeSecs, 1, numRepsCueTimeSecs);
+% % Randomise
+% cols2 = size(cueTimeFramesMat, 2);
+% randCol2 = randperm(cols2);
+% cueTimeFramesJitter = cueTimeFramesMat(:, randCol2);
 
 % Target (On/offset) point time in seconds and frames (0.1 secs)
 tOnOffsetTimeSecs = 0.1;
@@ -304,13 +307,17 @@ tAccTimeFrames = tAccTimeSecs/ifi;
 % Target (Precision Gap) point time in seconds and frames (0.1 secs);
 % Wait for Gap location Response, then cont. to next trial
 
-% Intertrial interval time
-isiTimeSecs = 1;
-isiTimeFrames = isiTimeSecs/ifi;
+% % Intertrial interval time
+% isiTimeSecs = 1;
+% isiTimeFrames = isiTimeSecs/ifi;
+% 
+% % Time between the cue and the target
+% cueTargetTimeSecs = 3;
+% cueTargetTimeFrames = isiTimeSecs/ifi;
 
-% Time between the cue and the target
-cueTargetTimeSecs = 3;
-cueTargetTimeFrames = isiTimeSecs/ifi;
+% Intertrial Interval
+interTrialTimeSecs = 1;
+interTrialTimeFrames = interTrialTimeSecs/ifi;
 
 % Frames to wait before redrawing
 waitframes = 1;
@@ -395,24 +402,50 @@ dataMatPrimary = nan(numTrials, 11);
 
 %% ------------------- Trigger Start ---------------------
 
-% Set up the parallel port (Trigger)
-port=serialportlist;
-com = IOPort('OpenSerialPort', char(port(2)), 'DTR=1');
-% Start labelling triggers
-IOPort('Write', com, uint8(254));
-WaitSecs(0.004);
-IOPort('Write', com, uint8(0));
+% % Set up the parallel port (Trigger)
+% port=serialportlist;
+% com = IOPort('OpenSerialPort', char(port(2)), 'DTR=1');
+% % Start labelling triggers
+% IOPort('Write', com, uint8(254));
+% WaitSecs(0.004);
+% IOPort('Write', com, uint8(0));
 
 %% ------------------------ Loop -------------------------
 
+% Get time info
+startBlock = GetSecs;
+
 % Animation loop: we loop for the total number of trials
 for trial = 1:numTrials
-
-    % % Set Grating parameters (?) randomise
-    % phase = rand .* 360;
-    % propertiesMat = [phase, freq, sigma, contrast, aspectRatio, 0, 0, 0]';
-
-    % Timing Jitter
+    
+    % Reset Jitter every loop
+    J = 0.1 + ((0.5 - 0.1).* (rand));
+    
+    % Fixation (Baseline) point time in seconds and frames (JITTER)
+    fixTimeSecs2 = fixTimeSecs1 + J;
+    fixTimeFrames2 = fixTimeSecs2/ifi;
+    % For 96 trials = 2 Time Jitter * 48
+    baseMatFixTimeSecs = [0 1];
+    numRepsFixTimeSecs = 48; 
+    fixTimeFramesMat = repmat(baseMatFixTimeSecs, 1, numRepsFixTimeSecs);
+    % Randomise
+    cols1 = size(fixTimeFramesMat, 2);
+    randCol1 = randperm(cols1);
+    fixTimeFramesJitter = fixTimeFramesMat(:, randCol1);
+    
+    % Spatial Cue (Attention Deployment) point time in seconds and frames (JITTER)
+    cueTimeSecs2 = cueTimeSecs1 + J; 
+    cueTimeFrames2 = cueTimeSecs2/ifi;
+    % For 96 trials = 2 Time Jitter * 48
+    baseMatCueTimeSecs = [0 1];
+    numRepsCueTimeSecs = 48; 
+    cueTimeFramesMat = repmat(baseMatCueTimeSecs, 1, numRepsCueTimeSecs);
+    % Randomise
+    cols2 = size(cueTimeFramesMat, 2);
+    randCol2 = randperm(cols2);
+    cueTimeFramesJitter = cueTimeFramesMat(:, randCol2);
+    
+    % Timing Jitter (Retrieve Matrix)
     fixJit = fixTimeFramesJitter(1, trial);
     cueJit = cueTimeFramesJitter(1, trial);
 
@@ -423,9 +456,6 @@ for trial = 1:numTrials
     elseif fixJit == 1
         fixTimeFrames = fixTimeFrames2;
         fixJitData = 1;
-    elseif fixJit == 2
-        fixTimeFrames = fixTimeFrames3;
-        fixJitData = 2;
     end
 
     if cueJit == 0
@@ -434,12 +464,9 @@ for trial = 1:numTrials
     elseif cueJit == 1
         cueTimeFrames = cueTimeFrames2;
         cueJitData = 1;
-    elseif cueJit == 2
-        cueTimeFrames = cueTimeFrames3;
-        cueJitData = 2;
     end
 
-    % Cue and target position
+    % Cue and target position (Retrieve Matrix)
     cuePos = combinedTrialsShuff(1, trial);
     gapLoc = combinedTrialsShuff(2, trial);
     trialType = combinedTrialsShuff(3, trial);
@@ -455,7 +482,6 @@ for trial = 1:numTrials
         colour = colourNC;
         pointList = pointListNC;
     end
-    % Screen('FramePoly', window, colour, pointList, penWidth);
 
     % Assign the correct gap location
     if gapLoc == 0
@@ -491,10 +517,6 @@ for trial = 1:numTrials
         leftright = right2;
         targetLR = 1;
     end
-    % Screen('FrameArc', window, grey, left, loc, gapDist, ringThickness, ringThickness);
-
-    % Between trial interval
-    WaitSecs(1);
 
     % Assign Trial Condition (NoGratings vs Gratings)
     if trialType == 0 % NoGratings trial
@@ -528,12 +550,24 @@ for trial = 1:numTrials
         % Flip the screen grey
         Screen('FillRect', window, grey);
         vbl = Screen('Flip', window);
-        WaitSecs(2);
-
+        % WaitSecs(2);
     end
     
     % Set the blend funciton for a nice antialiasing
     Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+
+    % <<<<<<<<<<<<<<<<<<< TASK FOR-LOOPS START HERE >>>>>>>>>>>>>>>>>>>
+
+    % Between trial interval
+    for i = 1:interTrialTimeFrames
+        % Set alpha blending
+        Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        % Flip screen
+        Screen('FillRect', window, grey);
+        vbl = Screen('Flip', window);
+    end
 
     % Present FC + FD -----> Fixation Time Window
     for i = 1:fixTimeFrames
@@ -548,18 +582,18 @@ for trial = 1:numTrials
         phase = phase + phaseJump;
         % Flip to screen
         vbl = Screen('Flip', window);
-        % Trigger (trial type + fixation label)
-        if i==1
-            if trialType == 0 % NoGrat
-                IOPort('Write', com, uint8(1)); % No Gratings
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif trialType == 1 % Grat
-                IOPort('Write', com, uint8(2)); % Gratings
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            end
-        end
+        % % Trigger (trial type + fixation label)
+        % if i==1
+        %     if trialType == 0 % NoGrat
+        %         IOPort('Write', com, uint8(1)); % No Gratings
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif trialType == 1 % Grat
+        %         IOPort('Write', com, uint8(2)); % Gratings
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     end
+        % end
     end
 
     % Present the FC + Spatial Cue (SC) -----> Attention Time Window
@@ -577,22 +611,21 @@ for trial = 1:numTrials
         % Flip to screen       
         vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);
         % % Trigger (cue appearing label)
-        if i==1
-            if cuePos == 0 % Left
-               IOPort('Write', com, uint8(3)); % Left Cue
-               WaitSecs(0.004);
-               IOPort('Write', com, uint8(0));
-            elseif cuePos == 1 % Right
-               IOPort('Write', com, uint8(4)); % Right Cue
-               WaitSecs(0.004);
-               IOPort('Write', com, uint8(0));   
-            elseif cuePos == 2 % Neutral
-               IOPort('Write', com, uint8(5)); % Neutral Cue
-               WaitSecs(0.004);
-               IOPort('Write', com, uint8(0));
-            end
-        end
-
+        % if i==1
+        %     if cuePos == 0 % Left
+        %        IOPort('Write', com, uint8(3)); % Left Cue
+        %        WaitSecs(0.004);
+        %        IOPort('Write', com, uint8(0));
+        %     elseif cuePos == 1 % Right
+        %        IOPort('Write', com, uint8(4)); % Right Cue
+        %        WaitSecs(0.004);
+        %        IOPort('Write', com, uint8(0));   
+        %     elseif cuePos == 2 % Neutral
+        %        IOPort('Write', com, uint8(5)); % Neutral Cue
+        %        WaitSecs(0.004);
+        %        IOPort('Write', com, uint8(0));
+        %     end
+        % end
     end
 
     % Present the FC + SC + Target Onset -----> Target On/Offset Time Window
@@ -614,41 +647,41 @@ for trial = 1:numTrials
         % Flip to screen       
         vbl = Screen('Flip', window, vbl + (waitframes - 0.5) * ifi);        
         % % Trigger (Gap appearance label)
-        if i==1
-            if gapLoc == 0 %(loc1)
-                IOPort('Write', com, uint8(6))
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif gapLoc == 1 %(loc2)
-                IOPort('Write', com, uint8(7));
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif gapLoc == 2 %(loc3)
-                IOPort('Write', com, uint8(8));
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif gapLoc == 3 %(loc4)
-                IOPort('Write', com, uint8(9));
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif gapLoc == 4 %(loc5)
-                IOPort('Write', com, uint8(10));
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif gapLoc == 5 %(loc6)
-                IOPort('Write', com, uint8(11));
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif gapLoc == 6 %(loc7)
-                IOPort('Write', com, uint8(12));
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            elseif gapLoc == 7 %(loc8)
-                IOPort('Write', com, uint8(13));
-                WaitSecs(0.004);
-                IOPort('Write', com, uint8(0));
-            end
-        end
+        % if i==1
+        %     if gapLoc == 0 %(loc1)
+        %         IOPort('Write', com, uint8(6))
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif gapLoc == 1 %(loc2)
+        %         IOPort('Write', com, uint8(7));
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif gapLoc == 2 %(loc3)
+        %         IOPort('Write', com, uint8(8));
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif gapLoc == 3 %(loc4)
+        %         IOPort('Write', com, uint8(9));
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif gapLoc == 4 %(loc5)
+        %         IOPort('Write', com, uint8(10));
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif gapLoc == 5 %(loc6)
+        %         IOPort('Write', com, uint8(11));
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif gapLoc == 6 %(loc7)
+        %         IOPort('Write', com, uint8(12));
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     elseif gapLoc == 7 %(loc8)
+        %         IOPort('Write', com, uint8(13));
+        %         WaitSecs(0.004);
+        %         IOPort('Write', com, uint8(0));
+        %     end
+        % end
     end
 
 
@@ -684,17 +717,17 @@ for trial = 1:numTrials
         elseif keyCode(locL)
             respDet = 0; % left
             respToBeMade = false;
-            % Trigger (detection response);
-            IOPort('Write', com, uint8(14)); % Detection Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (detection response);
+            % IOPort('Write', com, uint8(14)); % Detection Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(locR)
             respDet = 1; % right
             respToBeMade = false;
-            % Trigger (detection response);
-            IOPort('Write', com, uint8(14));  % Detection Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (detection response);
+            % IOPort('Write', com, uint8(14));  % Detection Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         end
     end
     endResp = GetSecs;
@@ -704,19 +737,23 @@ for trial = 1:numTrials
     % Response correctness
     if respDet == targetLR
         correctDet = 1; % correct detection
-        % Trigger (correct side response)
-        WaitSecs(0.1);
-        IOPort('Write', com, uint8(15)); % Correct Det
-        WaitSecs(0.004);
-        IOPort('Write', com, uint8(0));
+        % % Trigger (correct side response)
+        % WaitSecs(0.1);
+        % IOPort('Write', com, uint8(15)); % Correct Det
+        % WaitSecs(0.004);
+        % IOPort('Write', com, uint8(0));
     elseif respDet ~= targetLR
         correctDet = 0; % incorrect detection
-        % Trigger (incorrect side response)
-        WaitSecs(0.1);
-        IOPort('Write', com, uint8(16)); % Incorrect Det
-        WaitSecs(0.004);
-        IOPort('Write', com, uint8(0));
+        % % Trigger (incorrect side response)
+        % WaitSecs(0.1);
+        % IOPort('Write', com, uint8(16)); % Incorrect Det
+        % WaitSecs(0.004);
+        % IOPort('Write', com, uint8(0));
     end
+
+    % In case keyboardpress not released, wait until released to cont.
+    % if not, may affect RT
+    KbReleaseWait;
 
     % "Where is the gap" frame
     for i = 1:tAccTimeFrames
@@ -750,59 +787,59 @@ for trial = 1:numTrials
         elseif keyCode(loc1Res)
             respAcc = 0;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(17)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(loc2Res)
             respAcc = 1;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(18)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(loc3Res)
             respAcc = 2;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(19)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(loc4Res)
             respAcc = 3;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(20)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(loc5Res)
             respAcc = 4;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(21)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(loc6Res)
             respAcc = 5;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(22)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(loc7Res)
             respAcc = 6;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(23)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         elseif keyCode(loc8Res)
             respAcc = 7;
             respToBeMade = false;
-            % Trigger (accuracy press response)
-            IOPort('Write', com, uint8(17)); % Gap Key pressed
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (accuracy press response)
+            % IOPort('Write', com, uint8(24)); % Gap Key pressed
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
         end
     end
     endResp2 = GetSecs;
@@ -810,19 +847,23 @@ for trial = 1:numTrials
 
     if gapLoc == respAcc
         correctAcc = 1; % 1 = correct response
-            % Trigger (Correct gap location)
-            WaitSecs(0.1);
-            IOPort('Write', com, uint8(18)); % Correct Loc
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (Correct gap location)
+            % WaitSecs(0.1);
+            % IOPort('Write', com, uint8(25)); % Correct Loc
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
     elseif gapLoc ~= respAcc
         correctAcc = 0; % 0 = incorrect response
-            % Trigger (incorrect gap location)
-            WaitSecs(0.1);
-            IOPort('Write', com, uint8(19));  % Incorrect Loc
-            WaitSecs(0.004);
-            IOPort('Write', com, uint8(0));
+            % % Trigger (incorrect gap location)
+            % WaitSecs(0.1);
+            % IOPort('Write', com, uint8(26));  % Incorrect Loc
+            % WaitSecs(0.004);
+            % IOPort('Write', com, uint8(0));
     end
+
+    % In case keyboardpress not released, wait until released to cont.
+    % if not, may affect RT
+    KbReleaseWait;
 
     % Clear the screen
     Screen('FillRect', window, grey);
@@ -836,24 +877,46 @@ for trial = 1:numTrials
     resultTable = array2table(dataMatPrimary, 'VariableNames', labels);
     % results\BEH or EEG\UNIQUE_ID\trial_X.csv
     % Set # of block
-    writetable(resultTable, ['results\BEH\' num2str(group) '\' num2str(id) '\block_ ' num2str(blockNum) '.csv']);
+    writetable(resultTable, ['results\BEH\' num2str(group) '\' num2str(id) '\block_' num2str(blockNum) '.csv']);
 
 end
 
+% Get trial time
+endBlock = GetSecs;
+blockTime = endBlock - startBlock;
+
 %% -------------------- Close Tigger --------------------
-% Pause recording
-IOPort('Write', com, uint8(255));
-% Close the serial port
-IOPort('Close', com);
-% Stop keyboard response
-ListenChar(0);
+% % Pause recording
+% IOPort('Write', com, uint8(255));
+% % Close the serial port
+% IOPort('Close', com);
+% % Stop keyboard response
+% ListenChar(0);
 
 %% ------------------------ End -------------------------
 DrawFormattedText(window, 'Finished! Press any Key to exit', 'center', 'center', black);
 Screen('DrawingFinished', window); 
 Screen('Flip', window);
 KbStrokeWait(-1);
-sca
+sca;
+
+%% ------------- Additional Validity Check --------------
+% cd(['C:\MATLAB\exp_1\results\BEH\C\' num2str(id)]);
+cd(['C:\MATLAB\exp_1\results\BEH\' num2str(group) '\' num2str(id)]);
+
+T = readtable (['block_' num2str(blockNum) '.csv']);
+[V1, ID1] = findgroups(T.validity);
+[V2, ID2] = findgroups(T.rtDet);
+
+boxplot(V2, V1);
+% ylim([0 100]);
+title(blockTime);
+xlabel('Validity');
+ylabel('RT');
+xticklabels({'invalid','valid', 'neutral'});
+
+cd C:\MATLAB\exp_1\
+
 
 
 
