@@ -405,6 +405,9 @@ dataMatPrimary = nan(numTrials, 11); % sama ini juga simpen
 
 %% ------------------------ Loop -------------------------
 
+% Get time info
+startBlock = GetSecs;
+
 % Animation loop: we loop for the total number of trials
 for trial = 1:numTrials
 
@@ -1314,9 +1317,13 @@ for trial = 1:numTrials
     
     % results\BEH or EEG\UNIQUE_ID\trial_X.csv
     % Set # of block
-    writetable(resultTable, ['results\BEH\' num2str(group) '\' num2str(id) '\practice_ ' num2str(blockNum) '.csv']);
+    writetable(resultTable, ['results\BEH\' num2str(group) '\' num2str(id) '\practice_' num2str(blockNum) '.csv']);
 
 end
+
+% Get trial time
+endBlock = GetSecs;
+blockTime = endBlock - startBlock;
 
 % %pause the recording
 % IOPort('Write', com, uint8(255));
@@ -1329,9 +1336,23 @@ DrawFormattedText(window, 'Finished! Press any Key to exit', 'center', 'center',
 Screen('DrawingFinished', window); 
 Screen('Flip', window);
 KbStrokeWait(-1);
-sca
+sca;
 
+%% ------------- Additional Validity Check --------------
+cd(['C:\MATLAB\exp_1\results\BEH\' num2str(group) '\' num2str(id)]);
 
+T = readtable (['practice_' num2str(blockNum) '.csv']);
+[V1, ID1] = findgroups(T.validity);
+[V2, ID2] = findgroups(T.rtDet);
+
+boxplot(V2, V1);
+% ylim([0 100]);
+title(blockTime);
+xlabel('Validity');
+ylabel('RT');
+xticklabels({'invalid','valid', 'neutral'});
+
+cd C:\MATLAB\exp_1\
 
 
 
