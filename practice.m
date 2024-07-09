@@ -1324,6 +1324,7 @@ end
 % Get trial time
 endBlock = GetSecs;
 blockTime = endBlock - startBlock;
+csvwrite(['results\BEH\' num2str(group) '\' num2str(id) '\practiceTime_' num2str(blockNum) '.csv'], blockTime);
 
 % %pause the recording
 % IOPort('Write', com, uint8(255));
