@@ -226,7 +226,6 @@ middleRadius = circleSize/2;
 middlePerimeter = 2*pi*middleRadius; % pixels
 radialFrequency = frequency*middlePerimeter / (2*pi); % cycles/degree, must be integral to avoid clip effect, corrected in the frag file
 circularFrequency = 0;
-what 
 % sigma < 0 is a sinusoid.
 sigma = 1;
 
@@ -881,9 +880,10 @@ for trial = 1:numTrials
 
 end
 
-% Get trial time
+% Get trial time & save
 endBlock = GetSecs;
 blockTime = endBlock - startBlock;
+csvwrite(['results\BEH\' num2str(group) '\' num2str(id) '\blockTime_' num2str(blockNum) '.csv'], blockTime);
 
 %% -------------------- Close Tigger --------------------
 % % Pause recording
