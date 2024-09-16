@@ -886,6 +886,7 @@ blockTime = endBlock - startBlock;
 csvwrite(['results\BEH\' num2str(group) '\' num2str(id) '\blockTime_' num2str(blockNum) '.csv'], blockTime);
 
 %% -------------------- Close Tigger --------------------
+WaitSecs(5);
 % % Pause recording
 % IOPort('Write', com, uint8(255));
 % % Close the serial port
